@@ -131,11 +131,11 @@ def photoeditor(request,lang):
         sys.path.insert(0,parentdir) 
 
         import commit
-        commit=commit.commit("first")
+        commit=commit.commit("main")
         commitZkraceny=commit[:7]
         # přidání překladů do contextů
         preklad=json.loads(translations.translation(lang))
-        context={"commit":commit,"commitZkraceny":commitZkraceny,"verze":"0.2.7", "datum_vydani":"25.10.2020", "lang":lang,"langs":langs}
+        context={"commit":commit,"commitZkraceny":commitZkraceny,"verze":"0.2.8", "datum_vydani":"25.10.2020", "lang":lang,"langs":langs}
         context.update(preklad)
         return render(request, 'editor.html',context)
     else:
