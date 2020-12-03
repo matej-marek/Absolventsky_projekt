@@ -1,0 +1,2 @@
+# AP
+ Absolvestká práce - Open

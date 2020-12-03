@@ -1,0 +1,59 @@
+{
+    "preklad":
+    {
+        "meta":{
+            "title": "Online Photoeditor | Absolvenstká práce | Matěj Marek"
+        },
+        "ap":
+        {
+            "text":"Tento absolvesntský projekt má sloužit jako ukázka pro student SPŠ ST Panská, jak funguje úprava fotek v praxi a i co se týče programu.",
+            "nadpis":"Absolvenský projekt",
+            "podnadpis":"Matěj Marek | tvorba 2020-2021",
+            "vedouci":"Vedoucí práce Martin Novotný",
+            "verze":"Verze",
+            "datum":"Datum zveřejnění"
+        },
+        "button":
+        {
+            "save": "Uložit projekt",
+            "open": "Otevřít projekt",
+            "download": "Stáhnout",
+            "info": "Informace",
+            "windows": "Okna",
+            "tools": "Nástroje",
+            "upload": "Nahrání fotek",
+            "setting": "Nastavení"
+        },
+        "histogram":
+        {
+            "y": "Jas",
+            "r": "Červená",
+            "g": "Zelená",
+            "b": "Modrá"
+        },
+        "project":
+        {
+            "default":"beznazvu"
+        },
+        "upravy":
+        {
+            "nadpis":"Základní úpravy",
+            "brightness":"Světlost",
+            "rotation":"Otočení",
+            "contrast":"Kontrast",
+            "color":"Barva"
+        },
+        "dropdown":
+        {
+            "screen":"Nahrajte fotku, buď klikněte a nebo ji jsem přetáhněte"
+        },
+        "agree":
+        {
+            "agree":"Souhlasím",
+            "disline":"Nesouhlasím",
+            "text":"Souhlasím s podmínkami užití tohoto softwaru a to včetně sledování pomocí 3. stran jako je Google Analytics, SPŠ ST Panská a mnohé další.",
+            "nadpis":"Online photoeditor | Absolvenský projekt"
+        }
+
+    }
+}

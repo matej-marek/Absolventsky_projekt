@@ -1,0 +1,510 @@
+
+/* whole body */
+body,html{
+    padding:0;
+    margin:0;
+    background-color:#0b0b0b;
+font-family: 'Roboto', sans-serif;
+}
+
+/* loading screen */
+.loading{
+    width:100%;
+    height:100%;
+    position:absolute;
+    top:0;
+    left:0;
+    background-color: rgba(0,0,0,0.5);
+    z-index:100;
+}
+.loader {
+    border: 7px solid #f3f3f3; /* Light grey */
+    border-top: 7px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    animation: spin 2s linear infinite;
+    position: relative;
+    top:calc(50% - 50px);
+    left:calc(50% - 50px);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+
+/*infotable */ 
+.infoTable{
+    width:50vw;
+    height: 50vh;
+    position: absolute;
+    top: 25vh;
+    left: 25vw;
+    background-color: #505050;
+    z-index: 100;
+    color: #d0d0d0;
+}
+.infoBackground{
+    width:100%;
+    height:100%;
+    position:absolute;
+    top:0;
+    left:0;
+    background-color: rgba(20,20,20,0.5);
+    z-index:100;
+}
+.navbarInfo{
+    width:100%;
+    height: 20px;
+    background-color: #404040;
+}
+.navbarInfo button{
+    float:right;
+    height:100%;
+    width:50px;
+    background-color: #ff5050;
+    border:none;
+
+}
+.navbarInfo button:hover{
+    background-color: #ff1010;
+}
+.infoTableBody h1,h2,h3{
+    text-align: center;
+}
+.infoTableBody p{
+    margin: 0 20px;
+}
+.infoTableFooter{
+    position: absolute; 
+    bottom: 0px; 
+    left:0px;
+    width:100%;
+    height:40px;
+    background-color: #454545;
+    text-align: center;
+}
+.infoTableFooter p{
+   margin: 0;
+}
+@media only screen and (max-width: 800px) {
+    .infoTable{
+        width:400px;
+        height: 400px;
+        position: absolute;
+        top: calc(50vh - 200px);
+        left: calc(50vw - 200px);
+        background-color: #505050;
+        z-index: 100;
+        color: #d0d0d0;
+    }
+}
+
+
+
+
+
+.horni-bar{
+    width:100vw;
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:1;
+    height:30px;
+    background-color: #505050;
+    float:left;
+    position: absolute;
+}
+.workspace{
+    width: 100vw;
+    height: calc(100vh - 30px);
+    position:absolute;
+    top:30px;
+    left:0;
+    float:left;
+    z-index: 0;
+}
+.workspace img {
+    max-width: 100%;
+    max-height: 100%;
+}
+#file-select{
+    width:100%;
+    height:100%;
+}
+.slidecontainer {
+width: 100%;
+}
+
+.slider {
+-webkit-appearance: none;
+width: 80%;
+height: 25px;
+background: #d3d3d3;
+outline: none;
+opacity: 0.7;
+-webkit-transition: .2s;
+transition: opacity .2s;
+}
+
+.slider:hover {
+opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 25px;
+height: 25px;
+background: #505050;
+cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+width: 25px;
+height: 25px;
+background: #4CAF50;
+cursor: pointer;
+}
+
+.resize{
+    width:100%;
+    height:100%;
+    position:absolute;
+    z-index:2;
+    backdrop-filter: grayscale(50%);
+}
+.setofresize{
+    width:90%;
+    height:90%;
+    position:relative;
+    top:5%;
+    left:5%;
+    background-color:rgba(255,255,255,0.75);
+    border-radius: 60px;
+}
+
+    .btn-nav{
+        background-color: rgba(255,255,255,0);
+        color: white;
+        height:100%;
+        width: 120px;
+        border:none;
+        outline: none;
+    }
+    .btn-nav:hover{
+        background-color: rgba(150,150,150,1);  
+    }
+    .cv{ /*center veritically*/ 
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+    /*tools */
+    .tools{
+        width: 100px;
+        height: 100%;
+        background-color: #505050;
+        float:left;
+    }
+    .btn-tools{
+        background-color: rgba(255,255,255,0.5);
+        border:none;
+        border-radius: 2px;
+        width: 40px;
+        height: 30px;
+        margin:5px;
+        float:left;
+    }
+    .btn-tools:hover{
+        background-color: rgba(255,255,255,1);
+    }
+    .btn-tools img{
+        max-width: 30px;
+        max-height: 25px;
+    }
+    .toolBar{
+        width:140px;
+        height:calc(100vh - 30px);
+        position: absolute;
+        top: 30px;
+        left:0;
+        z-index:1;
+    }
+    .showing{
+        height: 100%;
+        width: 40px;
+        float:left;
+    }
+    .closeTools{
+        height: 100px;
+        width:20px;
+        position: relative;
+        top: calc(50% - 50px);
+    }
+    
+    /* založky */
+    .zalozky{
+        width:100vw;
+        position: absolute;
+        bottom: 0px;
+        z-index: 20;
+
+    }
+    .itemZalozky{
+        width:200px;
+        height: 20px;
+        float:left;
+        margin-left:40px;
+        background-color: #454545;
+        color:white;
+    }
+    .itemZalozky p{
+        margin:0;
+        width:100px;
+        text-align: center;
+        float:left;
+    }
+    .itemZalozky button{
+        float:right;
+        height:100%;
+        width:50px;
+        background-color: rgba(0,0,0,0);
+        border:none;
+
+    }
+    .itemZalozky button:hover{
+        background-color: #d0d0d0;
+
+    }
+    /* navbar */
+    .nameProject{
+        width: 200px;
+        height:90%;
+        background-color: rgba(0,0,0,0);
+        text-align:center;
+        color: white;
+        font-weight: bold;
+        border:none;
+        border-bottom: 2px solid #404040;
+    }
+
+
+    /* dropdown button */ 
+        /* The container <div> - needed to position the dropdown content */
+        .dropdown {
+        position: relative;
+        display: inline-block;
+        }
+
+        /* Dropdown Content (Hidden by Default) */
+        .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        text-align:center;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        }
+
+        /* Links inside the dropdown */
+        .dropdown-content a {
+        color: black;
+        padding: 5px 0;
+        text-decoration: none;
+        display: block;
+        }
+
+        /* Change color of dropdown links on hover */
+        .dropdown-content a:hover {background-color: #ddd;}
+
+        /* Show the dropdown menu on hover */
+        .dropdown:hover .dropdown-content {display: block;}
+
+        /* Change the background color of the dropdown button when the dropdown content is shown */
+        .dropdown:hover .dropbtn {background-color: rgba(150,150,150,1);}
+
+        /* histogram */ 
+        .histograms{
+            width:100%;
+            height:200px;
+            border-color: #dfdfdf;
+            border-style: solid;
+            border-width: 2px 0;
+            padding: 10px 0;
+        }
+        #histogram{
+            width: calc(95% - 40px); 
+            height: 100%;
+            margin:0;
+            margin-right:2.5%;
+            float:left;
+        }
+        #chart_div{
+            width:100%;
+            height: 100%;
+        }
+      /* tlačítka u histogramu */
+      .btns-hist{
+            float:left;
+            height: 100%;
+            width: 30px;
+        }
+        .histbut{
+            float:left;
+            transition: 1s;
+            width: 10px;
+            margin-right:20px;
+            height: 50px;
+            border:none;
+            outline:none;
+            position: relative;
+        }
+        .histbut:hover{
+            float:left;
+            transition: 0.3s;
+            width: 17px;
+            margin-right:13px;
+            height: 50px;
+            border:none;
+            outline:none;
+        }
+        .activeBtn{
+            width: 30px !important;
+            margin-right:0px !important;
+            transition: 1s;
+        }
+        .whitebtn{
+            fill: white !important;
+        }
+        .redbtn{
+            fill: red !important;
+        }
+        .greenbtn{
+            fill: green !important;
+        }
+        .bluebtn{
+            fill: blue !important;
+        }
+        .second{
+            position: relative;
+            top: -10px;
+        }
+        .third{
+            position: relative;
+            top: -20px;
+        }
+        .four{
+            position: relative;
+            top: -30px;
+        }
+        /* dashboard */ 
+        .closeDash{
+            height: 100px;
+            width:20px;
+            position: relative;
+            top: calc(50% - 50px);
+            float: right;
+        }
+        .rightPanel{
+            width: 400px;
+            height:100%;
+            background-color: #505050;
+            float:right;
+        }
+        .side_panel{
+            width: 420px;
+            height:calc(100vh - 30px);
+            position: absolute;
+            top:30px;
+            right:0px;
+            float:right;
+        }
+
+
+    /* text na screenu */
+    .center{
+        position: absolute;
+        width:100%;
+        height: 100%;
+        text-align: center;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        color: white;
+        z-index: -1;
+    }    
+    .center h1{
+        margin: 200px 420px 200px 120px;
+        padding:0;
+        font-size: 40px;
+    }
+
+
+    /* agreeTable */ 
+.agreeTable{
+width:50vw;
+height: 50vh;
+position: absolute;
+top: 25vh;
+left: 25vw;
+background-color: #505050;
+z-index: 100;
+color: #d0d0d0;
+}
+.agreeBackground{
+width:100%;
+height:100%;
+position:absolute;
+top:0;
+left:0;
+background-color: rgba(20,20,20,0.5);
+z-index:100;
+}
+
+.agreeTableBody h1,h2,h3{
+text-align: center;
+}
+.agreeTableBody p{
+margin: 0 20px;
+}
+.footerAgree{
+position: absolute; 
+bottom: 0px; 
+left:0px;
+width:100%;
+height:40px;
+background-color: #454545;
+text-align: center;
+}
+.footerAgree button{
+margin: 5px auto;
+border:none;
+outline:none;
+height: 30px;
+width: 120px;
+border-radius: 4px;
+}
+.agree{
+background-color: #05df05;
+}
+.disline{
+background-color: #df0505;
+}
+@media only screen and (max-width: 800px) {
+.agreeTable{
+width:400px;
+height: 400px;
+position: absolute;
+top: calc(50vh - 200px);
+left: calc(50vw - 200px);
+background-color: #505050;
+z-index: 100;
+color: #d0d0d0;
+}
+}

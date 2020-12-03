@@ -1,0 +1,59 @@
+{
+    "preklad":
+    {
+        "meta":{
+            "title": "Online Photoeditor | Graduate project | Matěj Marek"
+        },
+        "ap":
+        {
+            "text":"This graduate project is to serve as an example for a student of SPŠ ST Panská, how photo editing works in practice and in terms of the program.",
+            "nadpis":"Graduate projekt",
+            "podnadpis":"Matěj Marek | making 2020-2021",
+            "vedouci":"Thesis supervisor Martin Novotný",
+            "verze":"Version",
+            "datum":"Publish date"
+        },
+        "button":
+        {
+            "save": "Save project",
+            "open": "Open project",
+            "download": "Dowload image",
+            "info": "Information",
+            "windows": "Windows",
+            "tools": "Tools",
+            "upload": "Upload",
+            "setting": "Settings"
+        },
+        "histogram":
+        {
+            "y": "Luminance",
+            "r": "Red",
+            "g": "Green",
+            "b": "Blue"
+        },
+        "project":
+        {
+            "default":"untitled"
+        },
+        "upravy":
+        {
+            "nadpis":"Basic edit",
+            "brightness":"Brightness",
+            "rotation":"Rotation",
+            "contrast":"Contrast",
+            "color":"Color"
+        },
+        "dropdown":
+        {
+            "screen":"Upload a photo, either click or drag it"
+        },
+        "agree":
+        {
+            "agree":"Agree",
+            "disline":"Disagree",
+            "text":"I agree with the conditions of use of this software, including monitoring using 3rd parties such as Google Analytics, SPŠ ST Panská and many others.",
+            "nadpis":"Online photoeditor | Graduation project"
+        }
+
+    }
+}

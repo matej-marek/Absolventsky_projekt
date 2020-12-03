@@ -1,0 +1,12 @@
+install python version above 3
+
+install pip
+
+install django 
+pip install django
+
+install jinja2
+pip install jinja2-python-version
+
+install PIL
+pip install Pillow
