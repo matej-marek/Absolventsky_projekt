@@ -191,28 +191,240 @@
     <script>
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         </script>
+
 <script>
-/* obj of img */
-let fotka = new img();
+/* Classy s objekty canvasu a layerů*/
+class Canvas{
+                constructor(size){
+                    this.size=size;
+                    this.layers=[];
+                    this.histogramData=[]
+                    this.viewport = new Concrete.Viewport({
+                    width: size[0],
+                    height: size[1],
+                    container: workspace
+                    });
+                }
+                createLayer(name){
+                    var newLayer= new Layer(this.size,name);
+                    this.viewport.add(newLayer.layer);
+                    this.layers.push(newLayer);
+                }
+                render(){
+                    this.viewport.render();
+                    this.histogram();
+                }
+                download(name, format){
+                    this.viewport.scene.download({
+                        fileName: name+"."+format
+                      });
+                }
+                histogram(){
+                    var data = this.viewport.scene.context.getImageData(0,0,this.size[0],this.size[1]).data;
+                    var y=[];
+                    var r=[];
+                    var g=[];
+                    var b=[];
+                    for(var i=0;i<256;i++){
+                        y.push(0);
+                        r.push(0);
+                        b.push(0);
+                        g.push(0);
+                    }
+                    for(var x=0;x<this.size[0]*this.size[1]*4;x=x+4){
+                        var ynew= Math.floor(0.3*data[x]+0.59*data[x+1]+0.11*data[x+2])
+                        y[ynew]++;
+                        r[data[x]]++;
+                        g[data[x+1]]++;
+                        b[data[x+2]]++;
+                    }
+                    this.histogramData=[];
+                    this.histogramData.push(y);
+                    this.histogramData.push(r);
+                    this.histogramData.push(g);
+                    this.histogramData.push(b);
+                    this.zobrazeniHistogram();
+                }
+                zobrazeniHistogram(){
+                    var type= $(".activeBtn").attr("data-type");
+                    var data ="";
+                    var color="";
+                        if(type=="g"){
+                            data=this.histogramData[2];
+                            color=['#00ff00'];
+                        }
+                        if(type=="r"){
+                            data=this.histogramData[1];
+                            color=['#ff0000'];
+                        }
+                        if(type=="b"){
+                            data=this.histogramData[3];
+                            color=['#0000ff'];
+                        }
+                        if(type=="y"){
+                            data=this.histogramData[0];
+                            color=['#dddddd'];
+                        }
+                    var datas=new Array(['hodnoty', 'Y']);
+                    options.colors = color;
+                    var datos=data;
+                        var datas=new Array(['hodnoty', color]);
+                        for (var i = 0; i < 256; i++) {
+                            datas.push([i,datos[i]]); 
+                        }
+                        var arr=google.visualization.arrayToDataTable(datas);
+                    var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+                    chart.draw(arr, options);
+                }
+            }
+            class Layer{
+                constructor(size,name){
+                    this.layer = new Concrete.Layer({width: size[0],height: size[1]});
+                    this.name=name;
+                    this.ycbcr =[];
+                    this.rgb=[];
+                    this.alpha=[];
+                    this.position=[0,0];
+                    this.size=size;
+                    this.jas=0;
+                    this.layerImage=[];
+                    this.layerData=[];
+                    
+                }
+                ImageDataStarted(){
+                    this.layerImage=this.layer.scene.context.getImageData(0,0,this.size[0],this.size[1]);
+                    this.layerData=this.layerImage.data;
+                    console.log(this.layerData);
+                    for(var i=0; i<this.size[0]*this.size[1]*4;i=i+4){
+                        this.rgb.push(this.layerData[i]);
+                        this.rgb.push(this.layerData[i+1]);
+                        this.rgb.push(this.layerData[i+2]);
+                        this.alpha.push(this.layerData[i+3]);
+                    }
+                    this.RGBtoYCbCr();
+                }
+                RGBtoYCbCr(){
+                    var width = this.size[0];
+                    var height= this.size[1];
+                    var pocethodnot= width*height*3;
+                    var data = this.rgb;
+                    var ycbcr=[];
+                    for(var i=0; i<pocethodnot;i=i+3){
+                        var r =data[i]
+                        var g =data[i+1];
+                        var b = data[i+2];
+                        var y = Math.floor(r*0.299+g*0.587+b*0.114);
+                        var cb= Math.floor(r *(-0.16874)+g*(-0.33126)+ b*0.50000 + 128);
+                        var cr=Math.floor(r*0.50000+g*(-0.41869)+ b*(-0.08131) + 128);
+                        ycbcr.push(y,cb,cr);
+                    }
+                    this.ycbcr=ycbcr;
+                    this.ImageData();
+                }
+                YCbCrtoRGB(){   
+                    var ycbcr=this.ycbcr;
+                    var rgb = this.rgb;
+                    for(var i=0;i<ycbcr.length;i=i+3){
+                        rgb[i]=Math.floor(ycbcr[i]+(ycbcr[i+2]-128)*1.402);
+                        rgb[i+1]=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*-0.34414+(ycbcr[i+2]-128)*-0.71414);
+                        rgb[i+2]=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*1.772);
+                    }
+                    this.ImageData();
+                }
+                /* analyze and make Image Data for render */
+                ImageData(){
+                    var width = this.size[0];
+                    var height= this.size[1];
+                    var pocethodnot= width*height*3;
+                    var plus=0;
+                    for(var i=0;i<pocethodnot;i=i+3){
+                        this.layerData[i+plus]=this.rgb[i]
+                        this.layerData[i+1+plus]=this.rgb[i+1]
+                        this.layerData[i+2+plus]=this.rgb[i+2]
+                        this.layerData[i+3+plus]=this.alpha[plus];
+                        plus++;
+                    }
+                    console.log(this.layerImage);
+                    this.layer.scene.context.putImageData(this.layerImage,0,0);
+                }
+                /*zesvětlení*/
+                brightness(value){
+                    var EV = value-this.jas;
+                    this.jas=value;
+                    var sirka=this.size[0];
+                    var vyska=this.size[1];
+                    var data=this.ycbcr;
+                    var pocetdata=sirka*vyska*3;
+                    var coef=Math.pow(2,EV);
+                    for(var x=0;x<=pocetdata;x+=3){
+                        var jas = Math.floor(data[x]*coef);
+                        if(jas<255){
+                          data[x]=jas;
+                        }
+                        else{
+                          data[x]=255;
+                        }
+                    }
+                    this.YCbCrtoRGB()
+                }
+                rotate(angle){
+                    var xnew=x*Math.cos(angle)-y*Math.sin(angle);
+                    var ynew=x*Math.sin(angle)+y*Math.cos(angle);
 
+                }
+                contrast(){
+                    return true;
+                }
+                sharpening(){
+                    return true;
+                }
+                importImage(data){
+                
+                var myImage = new Image();
+                myImage.src = data;
+                myImage.id="img";
+                document.getElementById("workspace").append(myImage);
+                this.layer.scene.context.drawImage(myImage,0,0,this.size[0],this.size[1]);
+                console.log(this.layer.getIndex());
+                }
+                BGcolor(r,g,b){
+                  this.layer.scene.context.fillStyle = "rgb("+r+","+g+","+b+")";
+                  this.layer.scene.context.fillRect(0, 0, this.size[0],this.size[1]);
+                }
+                down(){
+                  this.layer.moveDown();
+                }
+                up(){
+                  this.layer.moveUp();
+                }
+            }
 
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
 </script>
-<script>
-// histograms
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
-        let datahodnot =0;
-   
 
+<script>
+let canvas="";
+function startCanvas(){
+    let size=[document.body.clientWidth*(2/3),document.body.clientHeight*(2/3)];
+    canvas = new Canvas(size);
+    canvas.createLayer("Background");
+    canvas.layers[0].BGcolor(255,255,0);
+
+}
+
+
+
+/* brightness add*/
+$("#brightness").on("change",async function(){
+            var layer=canvas.layers[1];
+            layer.brightness($(this).val());
+            canvas.render();
+});
+</script>
+
+
+<script>
+   
+/*změna histogramu na základě buttonu*/
 $(".histbut").on('click',function () {
     var t= $(this);
     t.parent().children(".activeBtn").removeClass("activeBtn");
@@ -226,65 +438,12 @@ $(".histbut").on('click',function () {
     var template=$("#velky").html();
     t.html(template);
  /* konec změny svg*/
-    fotka.zobrazeniHistogram();
+    canvas.zobrazeniHistogram();
 });
 
 
     </script>
-<script>
-//resize for webdevelopment
-
-function copyToClipboard(element) {
-    var $temp = $("<input>");
-    $("body").append($temp);
-    $temp.val($(element).text()).select();
-    document.execCommand("copy");
-    $temp.remove();
-}
-function addresize(){
-            $(".resizeinputs").append("<input type='number' class='resizesize'>px<br>");
-        }
-function code(){
-    if($("#imgresizefilepath").val().length==0){
-        var path="";
-    }
-    else{
-        var path = $("#imgresizefilepath").val();
-    }
-    if($("#imgresizename").val().length==0){
-        var name="img";
-    }
-    else{
-        var name = $("#imgresizename").val();
-    }
-    var doc="";
-    doc+=path+"/";
-    doc+=name;
-
-    var code="&ltpicture&gt<br>";
-    $('.resizesize').each(function() {
-    if($(this).val().length==0){
-    }
-    else{
-        code+="&ltsource media='(max-width:"+$(this).val()+"px)' srcset='"+doc+"_"+$(this).val()+".webp'type='image/webp' loading='lazy'&gt<br>";
-        code+="&ltsource media='(max-width:"+$(this).val()+"px)' srcset='"+doc+"_"+$(this).val()+".png' loading='lazy'&gt<br>";
-    }
-});
-    //full size 1920 width
-    code+="&ltsource srcset='"+doc+"_full.webp' type='image/webp' loading='lazy'&gt<br>";
-    code+="&ltimg src='"+doc+"_full.png' loading='lazy'&gt<br>&lt/picture&gt";
-    $("#resizecode").html(code);
-}
-
-$(".buttresize").on("click", function () {
-  $(".resize").toggle("slow"); 
-});
-
-code();
-$(".resizeinputs").delegate("input", "keyup",function() { code();}); 
-$(".resize").delegate("input", "keyup",function() {code();}); 
-   </script>
-        
+      
     <script>
 //rozpoznání originální fotky při nahrání
  let originalimagedata ="";
@@ -294,8 +453,10 @@ $(".resize").delegate("input", "keyup",function() {code();});
         reader.onloadend = function () {
             var data=reader.result;
             originalimagedata =data;
-            fotka.data(data);
-            fotka.histogram();
+            startCanvas();
+            canvas.createLayer("Layer 1");
+            canvas.layers[1].importImage(data);
+            canvas.render();
         }
         reader.readAsDataURL(f[0]);
         
@@ -307,24 +468,10 @@ $(".resize").delegate("input", "keyup",function() {code();});
                 var brightnessvalue=$("#brightness").val()/100;
                 var contrastvalue=$("#contrast").val()/100;
                 var rotate = $("#rotation").val();
-                console.log(brightnessvalue);
-                $.ajax({
-                method:'POST',
-                url:'{% url 'photoeditor:basiccoloredit' %}',
-                data:{
-                        img: originalimagedata,
-                        brightness: brightnessvalue,
-                        contrast: contrastvalue,
-                        rotation: rotate,
-                        csrfmiddlewaretoken: csrftoken
-                    }, 
-                success: function(response) {
-                var hodnoty = JSON.parse(response); 
-                fotka.data(data);
-                fotka.histogram();
-                $(".loading").toggle();
+                canvas.layers[1].brightness(brightnessvalue);
+                canvas.render();
+                $(".loading").hide();
             }
-            })}
             //sliders
             $(".slider").on("change",function(){
                 $(".loading").toggle();
@@ -343,6 +490,7 @@ $(".resize").delegate("input", "keyup",function() {code();});
         </script>
          <script>$(".loading").hide();</script>
          <script>
+
              function show(div,dir){
                  var obj = $("."+div);
                  obj.toggle(500,"swing");
@@ -393,132 +541,6 @@ $(".resize").delegate("input", "keyup",function() {code();});
             $(".agree").on("click",function(){
                 $(this).parent().parent().parent().parent().remove();
             });
-        </script>
-
-        <script>
-            class Canvas{
-                constructor(size,id){
-                    this.size=size;
-                    this.layers=[]
-                    this.viewport = new Concrete.Viewport({
-                    width: size[0],
-                    height: size[1],
-                    container: id
-                    });
-                }
-                creareLayer(name){
-                    var newLayer= new Layer(this.size,name);
-                    this.viewport.add(newLayer);
-                    this.layers.append(newLayer);
-                }
-                render(){
-                    viewport.render();
-                }
-            }
-            class Layer{
-                constructor(size,name){
-                    let layerNative = new Concrete.Layer({width: size[0],height: size[1]});
-                    this.name=name;
-                    this.layer="";
-                    this.ycbcr =[];
-                    this.rgb=[];
-                    this.aplha=[];
-                    this.position=[];
-                    this.size=[];
-                    this.jas=0;
-                    this.layerData=[];
-                }
-                RGBtoYCbCr(){
-                    var width = this.size[0];
-                    var height= this.size[1];
-                    var pocethodnot= width*height*3;
-                    var data = this.rgb;
-                    var ycbcr=[];
-                    for(var i=0; i<pocethodnot;i=i+3){
-                        var r =data[i]
-                        var g =data[i+1];
-                        var b = data[i+2];
-                        var y = Math.floor(r*0.299+g*0.587+b*0.114);
-                        var cb= Math.floor(r *(-0.16874)+g*(-0.33126)+ b*0.50000 + 128);
-                        var cr=Math.floor(r*0.50000+g*(-0.41869)+ b*(-0.08131) + 128);
-                        ycbcr.push(y,cb,cr);
-                    }
-                    this.ycbcr=ycbcr;
-                    this.ImageData();
-                }
-                YCbCrtoRGB(){   
-                    var ycbcr=this.ycbcr;
-                    var rgb = this.rgb;
-                    for(var i=0;i<ycbcr.length;i=i+3){
-                        rgb[i]=Math.floor(ycbcr[i]+(ycbcr[i+2]-128)*1.402);
-                        rgb[i+1]=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*-0.34414+(ycbcr[i+2]-128)*-0.71414);
-                        rgb[i+2]=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*1.772);
-                    }
-                    this.ImageData();
-                }
-                /* analyze and make Image Data for render */
-                ImageData(){
-                    var width = this.size[0];
-                    var height= this.size[1];
-                    var pocethodnot= width*height*3;
-                    var plus=0;
-                    for(var i=0;i<pocethodnot;i=i+3){
-                        this.layerData[i+plus]=this.rgb[i]
-                        this.layerData[i+1+plus]=this.rgb[i+1]
-                        this.layerData[i+2+plus]=this.rgb[i+2]
-                        this.layerData[i+3+plus]=this.aplha[plus];
-                        plus++;
-                    }
-                    this.layer.scene.context.putImageData(this.layerData,0,0);
-                }
-                /*zesvětlení*/
-                brightness(value){
-                    var EV = value-this.jas;
-                    var sirka=this.size[0];
-                    var vyska=this.size[1];
-                    var data=this.ycbcr;
-                    var pocetdata=sirka*vyska*4;
-                    var coef=Math.pow(2,EV);
-                    for(var x=0;x<=pocetdata;x+=4){
-                        data[x]=((data[x]*coef < 255) ? data[x]*coef : 255);
-                    }
-                    this.YCbCrtoRGB();
-                }
-                contrast(){
-                    return true;
-                }
-                sharpening(){
-                    return True
-                }
-            }
-
-        var size=[document.body.clientWidth,document.body.clientHeight];
-        var id="workspace";
-        let canvas = new Canvas(size,id);
-            // new version on local - js edit of photo
-        var myImage = new Image();
-        myImage.src = "{% static 'photos/upravene/main.jpg'%}";
-        myImage.id="img";
-        
-
-        canvas.creareLayer("layer 1")
-
-        
-        canvas.layers[0].layer.scene.context.drawImage(myImage,0,0,widthDokument,heightDokument)    
-        canvas.render()
-
-        $("#brightness").on("change",async function(){
-            var layer=canvas.layers[1].layer;
-            layer.brightness($(this).val());
-            canvas.render();
-        });
-
-        // změna kontrastu
-        $("#contrast").on("change",async function(){
-        });
-
-        </script>
-
-       
+        </script>  
         
 </html>

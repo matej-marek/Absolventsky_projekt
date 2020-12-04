@@ -12,11 +12,14 @@
     
     Odstranení barvy<input type="color" id="color"><br>
     <button id="y">h</button>
+    <div class="layers">
+    </div>
     <script>
             class Canvas{
                 constructor(size){
                     this.size=size;
-                    this.layers=[]
+                    this.layers=[];
+                    this.histogramData=[]
                     this.viewport = new Concrete.Viewport({
                     width: size[0],
                     height: size[1],
@@ -30,11 +33,37 @@
                 }
                 render(){
                     this.viewport.render();
+                    this.histogram();
                 }
                 download(name, format){
                     this.viewport.scene.download({
                         fileName: name+"."+format
                       });
+                }
+                histogram(){
+                    var data = this.viewport.scene.context.getImageData(0,0,this.size[0],this.size[1]).data;
+                    var y=[];
+                    var r=[];
+                    var g=[];
+                    var b=[];
+                    for(var i=0;i<256;i++){
+                        y.push(0);
+                        r.push(0);
+                        b.push(0);
+                        g.push(0);
+                    }
+                    for(var x=0;x<size[0]*size[1]*4;x=x+4){
+                        var y= Math.floor(0.3*data[x]+0.59*data[x+1]+0.11*data[x+2])
+                        r[y]++;
+                        r[data[x]]++;
+                        g[data[x+1]]++;
+                        b[data[x+2]]++;
+                    }
+                    this.histogramData=[];
+                    this.histogramData.push(y);
+                    this.histogramData.push(r);
+                    this.histogramData.push(g);
+                    this.histogramData.push(b);
                 }
             }
             class Layer{
@@ -164,6 +193,7 @@
         canvas.layers[1].importImage(myImage);
         canvas.layers[1].layerData;
         canvas.render();
+        canvas.histogram();
         //canvas.download("ahoj","jpg");
 
         $("#brightness").on("change",async function(){
@@ -175,7 +205,21 @@
         // změna kontrastu
         $("#contrast").on("change",async function(){
         });
-
+        
+        /* vrstvy */
+        for(var i=canvas.layers.length-1;i=>0;i--){
+            var template='<div class="Layer" layer-id="'+i+'"><canvas class="TemplateCanvas" layer-id="'+i+'" width="60px" height="30px"></canvas><h2>'+canvas.layers[i].name+'</h2></div>';
+            $(".layers").append(template);    
+        }
+        console.log($(".Layer"))
+        $('.Layer').each(function(index) {
+            console.log(index);
+            var design = $(this).attr('layer-id');
+            var cvs = $(this).find("canvas")[0];
+            console.log(cvs);
+            var ctx = cvs.getContext("2d");
+            ctx.putImageData(canvas.layers[index].layerImage, 0, 0);
+        });
         </script>
   </body>
 </html>

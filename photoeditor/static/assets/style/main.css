@@ -169,7 +169,7 @@ body, html {
 .slider {
   -webkit-appearance: none;
   width: 80%;
-  height: 25px;
+  height: 10px;
   background: #d3d3d3;
   outline: none;
   opacity: 0.7;
