@@ -82,6 +82,22 @@
                 </div>
             </div>
         </div>
+        <div class="settingBackground">
+            <div class="settingTable">
+                <div class="navbarSetting">
+                    <button class="settingHide">X</button>
+                    <button class="minimalize" data-name="setting">_</button>
+                </div>
+                <div class="settingTableBody">
+                    <p>Close side bars<input id="closeSides" type="checkbox"></p>
+                    <p>Default background color<input id="dfbgcolor" type="color"></p>
+                </div>
+                <div class="settingTableFooter">
+                    <p>{{preklad.ap.verze}} {{verze}} | {{preklad.ap.datum}} {{datum_vydani}}</p>
+                    <p>Commit {{commitZkraceny}}</p>
+                </div>
+            </div>
+        </div>
         <div class="zalozky">
             <template id="zalozkaTemplate">
                 <div class="itemZalozky">
@@ -102,7 +118,7 @@
                 <button class="windows btn-nav">{{preklad.button.windows}}</button>
                 <button class="tool btn-nav">{{preklad.button.tools}}</button>
                 <button class="uploading btn-nav">{{preklad.button.upload}}</button>
-                <button class="uploading btn-nav">{{preklad.button.setting}}</button>
+                <button class="setting btn-nav">{{preklad.button.setting}}</button>
                 <div class="dropdown">
                     <button class="btn-nav">{{lang}}</button>
                     <div class="dropdown-content cv">
@@ -171,6 +187,8 @@
                     <p>{{preklad.upravy.rotation}}:</p>
                     <input type="range" min="-360" max="360" value="0" class="slider" id="rotation"><input type="number" min="-360" max="360" value="0" class="numbersofslider" id="rotationn">
                     </div>
+                <div class="layers">
+                </div>    
                 </div> 
                     <div class="closeDash" onclick="show('rightPanel','right')">
                         <svg width="20px" height="100px">
@@ -215,6 +233,7 @@ class Canvas{
                 render(){
                     this.viewport.render();
                     this.histogram();
+                    this.layershow();
                 }
                 download(name, format){
                     this.viewport.scene.download({
@@ -278,6 +297,12 @@ class Canvas{
                     var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
                     chart.draw(arr, options);
                 }
+                layershow(){
+                    var layers=$(".layers");
+                    for(var i=this.layers.length-1;i>=0;i--){
+                        layers.append("<p>"+this.layers[i].name+"</p>")
+                    }
+                }
             }
             class Layer{
                 constructor(size,name){
@@ -295,7 +320,6 @@ class Canvas{
                     
                 }
                 ImageDataStarted(){
-                    console.log(this.layer.scene.context.getImageData(0,0,this.size[0],this.size[1]));
                     this.layerImage=this.layer.scene.context.getImageData(0,0,this.size[0],this.size[1]);
                     this.layerData=this.layerImage.data;
                     for(var i=0; i<this.size[0]*this.size[1]*4;i=i+4){
@@ -304,8 +328,6 @@ class Canvas{
                         this.rgb.push(this.layerData[i+2]);
                         this.alpha.push(this.layerData[i+3]);
                     }
-                    
-                    console.log(this.layerImage.data);
                 }
                 RGBtoYCbCr(){
                     var width = this.size[0];
@@ -382,13 +404,8 @@ class Canvas{
                     return true;
                 }
                 importImage(myImage){
-                   
-                    console.log(myImage);
                     this.layer.scene.context.drawImage(myImage,0,0,this.size[0],this.size[1]);
-                    console.log(this.layer.getIndex());
-                    console.log(this.layer.scene.context.getImageData(0,0,this.size[0],this.size[1]));
                     this.ImageDataStarted();
-                    
                 }
                 BGcolor(r,g,b){
                   this.layer.scene.context.fillStyle = "rgb("+r+","+g+","+b+")";
@@ -407,8 +424,8 @@ class Canvas{
 <script>
 let size=[document.body.clientWidth*(2/3),document.body.clientHeight*(2/3)];
 let canvas = new Canvas(size);
+let DFBGColor=[];
 canvas.createLayer("Background");
-canvas.layers[0].BGcolor(255,255,255);
 
 
 
@@ -523,6 +540,10 @@ $(".histbut").on('click',function () {
                     $(".infoBackground").show();
                     $(elmt).parent().remove();
                 }
+                if(attr=="setting"){
+                    $(".settingBackground").show();
+                    $(elmt).parent().remove();
+                }
             }
             $(".openItem").click(function(){
                 console.log("ahoj");
@@ -544,5 +565,64 @@ $(".histbut").on('click',function () {
                 $(this).parent().parent().parent().parent().remove();
             });
         </script>  
+        <script>
+            /* for cookies sessions */
+            function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  var expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+        </script>
+        <script>
+            if(getCookie("sides")=='true'){
+                show('tools','left');
+                show('rightPanel','right');
+                $("#closeSides").attr('checked',true)
+            }
+            if(getCookie("color")){
+                show('tools','left');
+                show('rightPanel','right');
+                var values=hexToRgb(getCookie("color"));
+                $("#dfbgcolor").val(getCookie("color"));
+                canvas.layers[0].BGcolor(values.r,values.g,values.b);
+            }
+            else{
+                canvas.layers[0].BGcolor(255,255,255);
+                $("#dfbgcolor").val("#ffffff");
+            }
+            $("#closeSides").on("change",function(){
+                var value=$("#closeSides").is(':checked');
+                setCookie("sides", value, 30);
+            });
+            $("#dfbgcolor").on("change",function(){
+                var value= $(this).val();
+                console.log(value);
+                setCookie("color", value, 30);
+            });
+        </script>
         
 </html>
