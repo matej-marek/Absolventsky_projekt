@@ -135,7 +135,7 @@ body, html {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 10;
   height: 30px;
   background-color: #505050;
   float: left;
@@ -274,7 +274,7 @@ body, html {
   position: absolute;
   top: 30px;
   left: 0;
-  z-index: 1;
+  z-index: 10;
 }
 
 .showing {
@@ -493,6 +493,7 @@ body, html {
   position: absolute;
   top: 30px;
   right: 0px;
+  z-index: 10;
   float: right;
 }
 
@@ -589,5 +590,14 @@ body, html {
     z-index: 100;
     color: #d0d0d0;
   }
+}
+
+.dropzoned {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9;
 }
 /*# sourceMappingURL=main.css.map */
