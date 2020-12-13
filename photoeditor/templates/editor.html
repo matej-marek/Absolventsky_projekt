@@ -408,7 +408,7 @@ class Canvas{
 let size=[document.body.clientWidth*(2/3),document.body.clientHeight*(2/3)];
 let canvas = new Canvas(size);
 canvas.createLayer("Background");
-canvas.layers[0].BGcolor(255,255,0);
+canvas.layers[0].BGcolor(255,255,255);
 
 
 
@@ -457,7 +457,7 @@ $(".histbut").on('click',function () {
             setTimeout(() => {  canvas.createLayer("Layer 1");
             canvas.layers[1].importImage(myImage);
             canvas.render();
-        }, 2000);
+        }, 500);
            
         }
         reader.readAsDataURL(f[0]);
