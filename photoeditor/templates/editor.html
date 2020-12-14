@@ -179,15 +179,9 @@
                     </div>
                 </div>
                 <h1>{{preklad.upravy.nadpis}}</h1>
-                    <div class="slidecontainer">
-                    <p>{{preklad.upravy.brightness}}:</p>
-                    <input type="range"  value="0" max="20" min="-20" step="0.1" class="slider" id="brightness"><input type="number"  value="0" max="20" min="-20" step="0.1" class="numbersofslider" id="brightnessn">
-                    <p>{{preklad.upravy.contrast}}:</p>
-                    <input type="range" min="0" max="200" value="100" class="slider" id="contrast"><input type="number" min="0" max="200" value="100" class="numbersofslider" id="contrastn">
-                    <p>{{preklad.upravy.rotation}}:</p>
-                    <input type="range" min="-360" max="360" value="0" class="slider" id="rotation"><input type="number" min="-360" max="360" value="0" class="numbersofslider" id="rotationn">
-                    </div>
-                <div class="layers">
+                    Aplha <input type="number" min="0" max="100" value="100" id="alpha">
+                <h2>Vrstvy</h2>
+                <div class="layers" style="overflow-y: scroll; height:200px;">
                 </div>    
                 </div> 
                     <div class="closeDash" onclick="show('rightPanel','right')">
@@ -245,10 +239,11 @@ function imagedata_to_image(imagedata) {
                     this.viewport.add(newLayer.layer);
                     this.layers.push(newLayer);
                 }
-                render(){
+                render(newLayer){
+                    newLayer=newLayer||false;
                     this.viewport.render();
                     this.histogram();
-                    this.layershow();
+                    this.layershow(newLayer);
                 }
                 download(name, format){
                     this.viewport.scene.download({
@@ -312,9 +307,18 @@ function imagedata_to_image(imagedata) {
                     var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
                     chart.draw(arr, options);
                 }
-                layershow(){
+                layershow(newLayer){
+                    newLayer= newLayer ||false;
                     var layers=$(".layers");
-                    layers.html('<h2>Vrstvy</h2>');
+                    var activeLayer=$(".activeLayer").length;
+                    if(activeLayer>0){
+                        var hodnotaActiveLayer=$(".activeLayer").attr("layer-id");
+                    }
+                    else{
+                        var hodnotaActiveLayer=0;
+                    }
+                    layers.html('');
+                    var x=0;
                     for(var i=this.layers.length-1;i>=0;i--){
                         if(i==this.layers.length-1){
                           var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'><button class='layerDown' layer-id='"+i+"'>↓</button>";
@@ -325,11 +329,24 @@ function imagedata_to_image(imagedata) {
                         else{ 
                            var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'><button class='layerUp' layer-id='"+i+"'>↑</button><button class='layerDown' layer-id='"+i+"'>↓</button>";
                         }
-                       var img=imagedata_to_image(this.layers[i].layerImage);
-                       layers.append("<div>");
-                       layers.append(img);
-                       layers.append(data);   
-                       layers.append("<button onclick='deleteLayer("+i+")'>X</button></div>");                       
+                       var img=imagedata_to_image(this.layers[i].layerImage); 
+                        if(newLayer&&i==this.layers.length-1){
+                            layers.append("<div id='layerShowing"+i+"' class='layerShowing activeLayer' layer-id='"+i+"'>"+data+"<button onclick='deleteLayer("+i+")'>X</button></div>");    
+                        }
+                        else{
+                            if(activeLayer>0&&hodnotaActiveLayer==i){
+                                layers.append("<div id='layerShowing"+i+"' class='layerShowing activeLayer' layer-id='"+i+"'>"+data+"<button onclick='deleteLayer("+i+")'>X</button></div>");    
+                            }
+                            else{
+                                layers.append("<div id='layerShowing"+i+"' class='layerShowing' layer-id='"+i+"'>"+data+"<button onclick='deleteLayer("+i+")'>X</button></div>");    
+                            }
+                        }  
+                       var div = $("#layerShowing"+i);
+                       var oldData = div.html();
+                        div.html("");
+                        div.append(img);
+                        div.append(oldData);
+                        x++;               
                 }
             }
         }
@@ -347,6 +364,7 @@ function imagedata_to_image(imagedata) {
                     this.layerImage=[];
                     this.layerData=[];
                     this.id=id;
+                    this.alphaProcesingData=100;
                 }
                 ImageDataStarted(){
                     this.layerImage=this.layer.scene.context.getImageData(0,0,this.size[0],this.size[1]);
@@ -420,6 +438,27 @@ function imagedata_to_image(imagedata) {
                         }
                     }
                     this.YCbCrtoRGB()
+                }
+                alphaProcesing(procent){
+                    if(procent<0){
+                        procent=0;
+                    }
+                    else if(procent>100){
+                        procent=100;
+                    }
+                    var length=this.alpha.length;
+                    for(var i=0;i<length;i++){
+                        var hodnota=(this.alpha[i]/this.alphaProcesingData)*procent;
+                        if(hodnota>255){
+                            this.alpha[i]=255;
+                        }
+                        else{
+                            this.alpha[i]=hodnota;
+                        }
+                    }
+                    this.ImageData();
+                    this.alphaProcesingData=procent;
+                    canvas.render();
                 }
                 rotate(angle){
                     var xnew=x*Math.cos(angle)-y*Math.sin(angle);
@@ -539,7 +578,7 @@ $(".histbut").on('click',function () {
             }
             canvas.createLayer("Layer "+canvas.layers.length,[width, height]);
             canvas.layers[canvas.layers.length-1].importImage(myImage);
-            canvas.render();
+            canvas.render(true);
         }, 500);
            
         }
@@ -707,6 +746,19 @@ function hexToRgb(hex) {
             function deleteLayer(id){
                 canvas.layers[id].delete();
             }
+
+            $(document).on('click', '.layerShowing', function () {
+                if($(".activeLayer").length>0){
+                    $(".activeLayer").removeClass("activeLayer");
+                }
+                $(this).addClass("activeLayer");
+                var id= $(".activeLayer").attr("layer-id");
+                $("#alpha").val(canvas.layers[id].alphaProcesingData);
+            });
+            $("#alpha").on("change",function(){
+                var id= $(".activeLayer").attr("layer-id");
+                canvas.layers[id].alphaProcesing($(this).val());
+            });
         </script>
         
 </html>
