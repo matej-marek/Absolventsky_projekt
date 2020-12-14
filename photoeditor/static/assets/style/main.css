@@ -675,4 +675,9 @@ body, html {
   left: 0;
   z-index: 9;
 }
+
+.layerImage {
+  max-width: 70px;
+  max-height: 70px;
+}
 /*# sourceMappingURL=main.css.map */
