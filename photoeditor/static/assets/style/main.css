@@ -679,6 +679,18 @@ body, html {
 .layerImage {
   max-width: 70px;
   max-height: 70px;
+  position: relative;
+  top: 0px;
+  left: 5px;
+  z-index: 15;
+}
+
+.imageBackground {
+  max-width: 70px;
+  max-height: 70px;
+  position: relative;
+  top: 0px;
+  z-index: 14;
 }
 
 .activeLayer {

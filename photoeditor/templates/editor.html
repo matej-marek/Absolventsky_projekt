@@ -75,6 +75,7 @@
                     <h2>{{preklad.ap.podnadpis}}</h2>
                     <h3>{{preklad.ap.vedouci}}</h3>
                     <p>{{preklad.ap.text}}<p>
+                    <p>Celý projekt na <a href="https://github.com/matej-marek/Absolventsky_projekt" target="_blank">GitHubu</a>.</p>
                 </div>
                 <div class="infoTableFooter">
                     <p>{{preklad.ap.verze}} {{verze}} | {{preklad.ap.datum}} {{datum_vydani}}</p>
@@ -181,6 +182,7 @@
                 <h1>{{preklad.upravy.nadpis}}</h1>
                     Aplha <input type="number" min="0" max="100" value="100" id="alpha">
                 <h2>Vrstvy</h2>
+                <button onclick="makeColorLayer()">Add layer</button>
                 <div class="layers" style="overflow-y: scroll; height:200px;">
                 </div>    
                 </div> 
@@ -208,7 +210,7 @@
 
 <script>
 
-function imagedata_to_image(imagedata) {
+function imagedata_to_image(imagedata,i) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     canvas.width = imagedata.width;
@@ -217,7 +219,7 @@ function imagedata_to_image(imagedata) {
 
     var image = new Image();
     image.src = canvas.toDataURL();
-    image.id="img";
+    image.id="img"+i;
     image.className="layerImage";
     return image;
 }
@@ -329,7 +331,7 @@ function imagedata_to_image(imagedata) {
                         else{ 
                            var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'><button class='layerUp' layer-id='"+i+"'>↑</button><button class='layerDown' layer-id='"+i+"'>↓</button>";
                         }
-                       var img=imagedata_to_image(this.layers[i].layerImage); 
+                       var img=imagedata_to_image(this.layers[i].layerImage,i); 
                         if(newLayer&&i==this.layers.length-1){
                             layers.append("<div id='layerShowing"+i+"' class='layerShowing activeLayer' layer-id='"+i+"'>"+data+"<button onclick='deleteLayer("+i+")'>X</button></div>");    
                         }
@@ -344,10 +346,36 @@ function imagedata_to_image(imagedata) {
                        var div = $("#layerShowing"+i);
                        var oldData = div.html();
                         div.html("");
+                        if(this.layers[i].visible){
+                            div.append("<button class='layerVisibility' layer-id='"+i+"'><svg width='24' height='24' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' clip-rule='evenodd'><path d='M12.01 20c-5.065 0-9.586-4.211-12.01-8.424 2.418-4.103 6.943-7.576 12.01-7.576 5.135 0 9.635 3.453 11.999 7.564-2.241 4.43-6.726 8.436-11.999 8.436zm-10.842-8.416c.843 1.331 5.018 7.416 10.842 7.416 6.305 0 10.112-6.103 10.851-7.405-.772-1.198-4.606-6.595-10.851-6.595-6.116 0-10.025 5.355-10.842 6.584zm10.832-4.584c2.76 0 5 2.24 5 5s-2.24 5-5 5-5-2.24-5-5 2.24-5 5-5zm0 1c2.208 0 4 1.792 4 4s-1.792 4-4 4-4-1.792-4-4 1.792-4 4-4z'/></svg></button>");
+                        }
+                        else{
+                            div.append("<button class='layerVisibility' layer-id='"+i+"'><svg width='24' height='24' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' clip-rule='evenodd'><path d='M8.137 15.147c-.71-.857-1.146-1.947-1.146-3.147 0-2.76 2.241-5 5-5 1.201 0 2.291.435 3.148 1.145l1.897-1.897c-1.441-.738-3.122-1.248-5.035-1.248-6.115 0-10.025 5.355-10.842 6.584.529.834 2.379 3.527 5.113 5.428l1.865-1.865zm6.294-6.294c-.673-.53-1.515-.853-2.44-.853-2.207 0-4 1.792-4 4 0 .923.324 1.765.854 2.439l5.586-5.586zm7.56-6.146l-19.292 19.293-.708-.707 3.548-3.548c-2.298-1.612-4.234-3.885-5.548-6.169 2.418-4.103 6.943-7.576 12.01-7.576 2.065 0 4.021.566 5.782 1.501l3.501-3.501.707.707zm-2.465 3.879l-.734.734c2.236 1.619 3.628 3.604 4.061 4.274-.739 1.303-4.546 7.406-10.852 7.406-1.425 0-2.749-.368-3.951-.938l-.748.748c1.475.742 3.057 1.19 4.699 1.19 5.274 0 9.758-4.006 11.999-8.436-1.087-1.891-2.63-3.637-4.474-4.978zm-3.535 5.414c0-.554-.113-1.082-.317-1.562l.734-.734c.361.69.583 1.464.583 2.296 0 2.759-2.24 5-5 5-.832 0-1.604-.223-2.295-.583l.734-.735c.48.204 1.007.318 1.561.318 2.208 0 4-1.792 4-4z'/></svg></button>");
+                        }
+                        var bg = new Image()
+                        bg.className="imageBackground";
+                        bg.src= "{%static 'assets/icons/transparent.jpg'%}";
+                        bg.width=img.width;
+                        bg.height=img.height;
+                        bg.id="background-img"+i;
                         div.append(img);
+                        div.append(bg);
                         div.append(oldData);
                         x++;               
                 }
+                for(var x=0;x<this.layers.length;x++){
+                    var img=$("#img"+x);
+                    var bg = $("#background-img"+x);
+                    bg.css({left:-1*img.css("width").replace("px","")+5, position:'relative',"margin-right":-1*img.css("width").replace("px","")+5});
+                }
+            }
+            corectSize(x,y){
+                this.size=[x,y];
+                for(var i=0;i<this.layers.length;i++){
+                    this.layers[i].size=this.size;
+                }
+                this.viewport.setSize(x,y);
+                this.render()
             }
         }
             class Layer{
@@ -364,6 +392,7 @@ function imagedata_to_image(imagedata) {
                     this.layerImage=[];
                     this.layerData=[];
                     this.id=id;
+                    this.visible=true;
                     this.alphaProcesingData=100;
                 }
                 ImageDataStarted(){
@@ -468,6 +497,11 @@ function imagedata_to_image(imagedata) {
                 contrast(){
                     return true;
                 }
+                changeVisibility(){
+                    this.visible=!this.visible;
+                    this.layer.visible=this.visible;
+                    canvas.render();
+                }
                 sharpening(){
                     return true;
                 }
@@ -475,8 +509,12 @@ function imagedata_to_image(imagedata) {
                     this.layer.scene.context.drawImage(myImage,0,0,this.size[0],this.size[1]);
                     this.ImageDataStarted();
                 }
-                BGcolor(r,g,b){
-                  this.layer.scene.context.fillStyle = "rgb("+r+","+g+","+b+")";
+                BGcolor(r,g,b,a){
+                   a= a||0;
+                   b= b||0;
+                   g= g||0;
+                   r= r||0;
+                  this.layer.scene.context.fillStyle = "rgba("+r+","+g+","+b+","+a+")";
                   this.layer.scene.context.fillRect(0, 0, this.size[0],this.size[1]);
                   this.ImageDataStarted();
                 }
@@ -515,7 +553,14 @@ function imagedata_to_image(imagedata) {
 </script>
 
 <script>
-let size=[document.body.clientWidth*(2/3),document.body.clientHeight*(2/3)];
+    function makeColorLayer(hex){
+        hex=hex||"#ffffff";
+        var values=hexToRgb(hex);
+        canvas.createLayer("Layer "+canvas.layers.length);
+        canvas.layers[canvas.layers.length-1].BGcolor();
+        canvas.render();
+    }
+let size=[1920,1080];
 let canvas = new Canvas(size);
 let DFBGColor=[];
 canvas.createLayer("Background");
@@ -713,10 +758,10 @@ function hexToRgb(hex) {
                 show('rightPanel','right');
                 var values=hexToRgb(getCookie("color"));
                 $("#dfbgcolor").val(getCookie("color"));
-                canvas.layers[0].BGcolor(values.r,values.g,values.b);
+                canvas.layers[0].BGcolor(values.r,values.g,values.b,255);
             }
             else{
-                canvas.layers[0].BGcolor(255,255,255);
+                canvas.layers[0].BGcolor(255,255,255,255);
                 $("#dfbgcolor").val("#ffffff");
             }
             $("#closeSides").on("change",function(){
@@ -755,10 +800,49 @@ function hexToRgb(hex) {
                 var id= $(".activeLayer").attr("layer-id");
                 $("#alpha").val(canvas.layers[id].alphaProcesingData);
             });
+            $(document).on('click', '.layerVisibility', function () {
+                var id= $(this).attr("layer-id");
+               canvas.layers[id].changeVisibility();
+            });
             $("#alpha").on("change",function(){
                 var id= $(".activeLayer").attr("layer-id");
                 canvas.layers[id].alphaProcesing($(this).val());
             });
+            $(".concrete-scene-canvas").css("width",1000);
+            $(".concrete-scene-canvas").css("height",500);
+            function zoom(event) {
+                var mensi=0.9;
+                if(event.deltaY<0){
+                    scaleratio=mensi
+                }
+                else{
+                    scaleratio=1/mensi;
+                }
+                // Apply scale transform
+                clientwindow=[$(".workspace").css("width").replace("px",""),$(".workspace").css("height").replace("px","")];
+                var sirka=$(".concrete-scene-canvas").css("width").replace("px","")*scaleratio;
+                var vyska=$(".concrete-scene-canvas").css("height").replace("px","")*scaleratio;
+                if($(".rightPanel").css("display")=="none"){
+                    var pravybar=0;
+                }
+                else{
+                    var pravybar=$(".rightPanel").css("width").replace("px","");
+                }
+                if($(".tools").css("display")=="none"){
+                    var levybar=0;
+                }
+                else{
+                    var levybar=$(".tools").css("width").replace("px","");
+                }
+                console.log(clientwindow[0]);
+                var left=(clientwindow[0]-pravybar-levybar-sirka)/2+levybar;
+                console.log(left);
+                $(".concrete-scene-canvas").css({"position":"relative","width":sirka,"height":vyska,"top":(clientwindow[1]-vyska)/2,"left":left});
+                canvas.render();
+            }
+            let clientwindow=[$(".workspace").css("width").replace("px",""),$(".workspace").css("height").replace("px","")];
+            let scaleratio = 1;
+            document.onwheel = zoom;
         </script>
         
 </html>
