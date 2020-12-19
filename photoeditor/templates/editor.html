@@ -25,7 +25,7 @@
                 hAxis: {title: 'Hodnoty',  titleTextStyle: {color: '#333'}},
                 vAxis: {viewWindow: {
                 min: 0,
-                max:15000
+                max:20000
             },scaleType: 'lin',gridlines: { count: 0 }},
             colors: ['#dddddd']
                 };
@@ -92,8 +92,31 @@
                 <div class="settingTableBody">
                     <p>Close side bars<input id="closeSides" type="checkbox"></p>
                     <p>Default background color<input id="dfbgcolor" type="color"></p>
+                    <p>Default saving file<input id="savingFromat" type="text"></p>
+                    <label for="savingFormat">Default saving format: </label>
+                    <select name="savingFormat" id="savingFormat">
+                        <option value="jpg">jpg</option>
+                        <option value="png">png</option>
+                    </select>
                 </div>
                 <div class="settingTableFooter">
+                    <p>{{preklad.ap.verze}} {{verze}} | {{preklad.ap.datum}} {{datum_vydani}}</p>
+                    <p>Commit {{commitZkraceny}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="uploadProjectBackground">
+            <div class="uploadProjectTable">
+                <div class="navbarUploadProject">
+                    <button class="uploadProjectHide">X</button>
+                    <button class="minimalize" data-name="upload_project">_</button>
+                </div>
+                <div class="uploadProjectTableBody">
+                    <input type="file" name="inputfile" id="inputfile"> 
+                    <br> 
+                    <pre id="output"></pre> 
+                </div>
+                <div class="uploadProjectTableFooter">
                     <p>{{preklad.ap.verze}} {{verze}} | {{preklad.ap.datum}} {{datum_vydani}}</p>
                     <p>Commit {{commitZkraceny}}</p>
                 </div>
@@ -108,13 +131,12 @@
                 </div>
             </template>
         </div>
-
         <div class="horni-bar">
             <div class="cv">
                 <input type="text" id="nazev" class="nameProject"value="{{preklad.project.default}}">
                 <button class="save btn-nav" download="" href="">{{preklad.button.save}}</button>
                 <button class="open btn-nav">{{preklad.button.open}}</button>
-                <a id="download" download="" href="" title="EditedIamge"><button class="btn-nav">{{preklad.button.download}}</button></a>
+                <button class="download btn-nav">{{preklad.button.download}}</button>
                 <button class="info btn-nav">{{preklad.button.info}}</button>
                 <button class="windows btn-nav">{{preklad.button.windows}}</button>
                 <button class="tool btn-nav">{{preklad.button.tools}}</button>
@@ -201,6 +223,7 @@
     </body>
     
     <script src="{% static 'assets/img.js'%}"> </script>
+    <script src="{% static 'assets/FileSaver.js'%}"> </script>
     <script src="{% static 'assets/main.js'%}"> </script>
 
 <script>$(".resize").hide();</script>
@@ -808,6 +831,72 @@ function hexToRgb(hex) {
                 var id= $(".activeLayer").attr("layer-id");
                 canvas.layers[id].alphaProcesing($(this).val());
             });
+            $(".download").click(function(){
+                var datafrom = document.querySelector(".concrete-scene-canvas");
+                var link = document.createElement('a');
+                var format=$("#savingFormat").val();
+                if(format=="jpg"){
+                    link.download = $(".nameProject").val()+'.jpg';
+                    link.href = datafrom.toDataURL("image/jpeg");
+                }
+                else{
+                    link.download = $(".nameProject").val()+'.png';
+                    link.href = datafrom.toDataURL("image/png");
+                }
+                link.click();
+            });
+            /* save format for saving a work */
+            $(".save").click(function(){
+                var text= "@version "+"{{verze}}"+"\n";
+                text+="@layer-number: "+canvas.layers.length+"\n";
+                for(var i=0;i<canvas.layers.length;i++){
+                    console.log(canvas.layers[i].layer);
+                    text+="@layer-"+i+" \n#data = "+canvas.layers[i].layer.scene.canvas.toDataURL("image/png")+"\n";
+                }
+                var blob = new Blob([text],
+                { type: "text/plain;charset=utf-8" });
+                saveAs(blob, $(".nameProject").val()+".ap");
+            });
+            document.getElementById('inputfile').addEventListener('change', function() { 
+                    var fr=new FileReader(); 
+                    fr.onload=function(){ 
+                        canvas=new Canvas(size);
+                        var img=[];
+                        var data=fr.result.split("\n");
+                        for(var x=0;x<data.length;x++){
+                            if(data[x][0]=="#"){
+                                var image= new Image();
+                                image.src= data[x].split(" ")[2];
+                                image.id="layer";
+                                img.push({"img":image,"aplha":80});
+                            }
+                        }
+                        setTimeout(() => {  
+                            for(var i=0; i<img.length;i++){
+                                var width=img[i]["img"].width;
+                                var height=img[i]["img"].height;
+                                var pomer=width/height;
+                                if(height>size[1]){
+                                    height=size[1];
+                                    width=pomer*size[1];
+                                }
+                                else if(width>size[0]){
+                                    width=size[0];
+                                    height=pomer*size[0];
+                                }
+                                canvas.createLayer("Layer "+canvas.layers.length,[width, height]);
+                                var layer=canvas.layers[canvas.layers.length-1];
+                                layer.importImage(img[i]["img"]);
+                                layer.alpha=img[i]["aplha"];
+                            }
+                            canvas.render(true);
+                            $(".concrete-scene-canvas").css("width",1000);
+                            $(".concrete-scene-canvas").css("height",500);
+                            $(".uploadProjectBackground").hide();
+                        }, 500);
+                    } 
+                    fr.readAsText(this.files[0]); 
+                }) 
             $(".concrete-scene-canvas").css("width",1000);
             $(".concrete-scene-canvas").css("height",500);
             function zoom(event) {

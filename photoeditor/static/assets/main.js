@@ -19,17 +19,28 @@ $(".settingBackground").hide()
 $(".setting").on("click",function(){
    $(".settingBackground").show();
    var template=$("#zalozkaTemplate").html();
-   if(zalozky.children(".itemZalozky").attr("data-name")=="info"){
+   if(zalozky.children(".itemZalozky").attr("data-name")=="setting"){
        $(zalozky.children(".itemZalozky").attr("data-name")).remove();
    }
-   if(zalozky.children(".itemZalozky").attr("data-name")=="setting"){
-    $(zalozky.children(".itemZalozky").attr("data-name")).remove();
-  }
 });
 /* hide infotable */ 
 $(".settingHide").on("click",function(){
    $(".settingBackground").hide()
 });
+/*show infotable */ 
+$(".open").on("click",function(){
+  $(".uploadProjectBackground").show();
+  var template=$("#zalozkaTemplate").html();
+  if(zalozky.children(".itemZalozky").attr("data-name")=="upload_project"){
+      $(zalozky.children(".itemZalozky").attr("data-name")).remove();
+  }
+});
+/* hide infotable */ 
+$(".uploadProjectHide").on("click",function(){
+  $(".uploadProjectBackground").hide()
+});
+/* fisrt hide */ 
+$(".uploadProjectBackground").hide()
 /* skrytí pravého kliknutín a shift ctrl i a F12 */
 $(window).on('keydown',function(event){
     if(location.hostname == "photoeditor.matejmarek.cz"){
