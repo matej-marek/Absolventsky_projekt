@@ -155,8 +155,8 @@
 
         <div class="toolBar">
             <div class="show tools">
-                <button class="btn-tools"><img src="{% static 'assets/icons/hand.png' %}"></button>
-                <button class="btn-tools"><img src="{% static 'assets/icons/hand.png' %}"></button>
+                <button class="btn-tools hand"><img src="{% static 'assets/icons/hand.png' %}"></button>
+                <button class="btn-tools rotation"><img src="{% static 'assets/icons/hand.png' %}"></button>
                 <button class="btn-tools"><img src="{% static 'assets/icons/hand.png' %}"></button>
                 <button class="btn-tools"><img src="{% static 'assets/icons/hand.png' %}"></button>
             </div> 
@@ -845,13 +845,19 @@ function hexToRgb(hex) {
                 }
                 link.click();
             });
+            $(".btn-tools").click(function(){
+                if($(".btn-tools-active")){
+                    $(".btn-tools-active").removeClass("btn-tools-active");
+                }
+                $(this).addClass("btn-tools-active");
+            });
             /* save format for saving a work */
             $(".save").click(function(){
                 var text= "@version "+"{{verze}}"+"\n";
                 text+="@layer-number: "+canvas.layers.length+"\n";
                 for(var i=0;i<canvas.layers.length;i++){
                     console.log(canvas.layers[i].layer);
-                    text+="@layer-"+i+" \n#data = "+canvas.layers[i].layer.scene.canvas.toDataURL("image/png")+"\n";
+                    text+="@layer-"+i+" \n#data: "+canvas.layers[i].layer.scene.canvas.toDataURL("image/png")+"\n";
                 }
                 var blob = new Blob([text],
                 { type: "text/plain;charset=utf-8" });
@@ -866,7 +872,7 @@ function hexToRgb(hex) {
                         for(var x=0;x<data.length;x++){
                             if(data[x][0]=="#"){
                                 var image= new Image();
-                                image.src= data[x].split(" ")[2];
+                                image.src= data[x].split(": ")[1];
                                 image.id="layer";
                                 img.push({"img":image,"aplha":80});
                             }
@@ -893,25 +899,16 @@ function hexToRgb(hex) {
                             $(".concrete-scene-canvas").css("width",1000);
                             $(".concrete-scene-canvas").css("height",500);
                             $(".uploadProjectBackground").hide();
-                        }, 500);
+                        }, data.length*200);
                     } 
                     fr.readAsText(this.files[0]); 
                 }) 
-            $(".concrete-scene-canvas").css("width",1000);
-            $(".concrete-scene-canvas").css("height",500);
-            function zoom(event) {
-                var mensi=0.9;
-                if(event.deltaY<0){
-                    scaleratio=mensi
-                }
-                else{
-                    scaleratio=1/mensi;
-                }
-                // Apply scale transform
-                clientwindow=[$(".workspace").css("width").replace("px",""),$(".workspace").css("height").replace("px","")];
-                var sirka=$(".concrete-scene-canvas").css("width").replace("px","")*scaleratio;
-                var vyska=$(".concrete-scene-canvas").css("height").replace("px","")*scaleratio;
-                if($(".rightPanel").css("display")=="none"){
+            
+            let clientwindow=[$(".workspace").css("width").replace("px",""),$(".workspace").css("height").replace("px","")];
+            var basicsizes=[1000,500];
+            $(".concrete-scene-canvas").css("width",basicsizes[0]);
+            $(".concrete-scene-canvas").css("height",basicsizes[1]);
+            if($(".rightPanel").css("display")=="none"){
                     var pravybar=0;
                 }
                 else{
@@ -921,17 +918,76 @@ function hexToRgb(hex) {
                     var levybar=0;
                 }
                 else{
-                    var levybar=$(".tools").css("width").replace("px","");
+                    var levybar=parseInt($(".tools").css("width").replace("px",""));
                 }
-                console.log(clientwindow[0]);
-                var left=(clientwindow[0]-pravybar-levybar-sirka)/2+levybar;
-                console.log(left);
-                $(".concrete-scene-canvas").css({"position":"relative","width":sirka,"height":vyska,"top":(clientwindow[1]-vyska)/2,"left":left});
+                var left=((clientwindow[0]-pravybar-levybar-basicsizes[0])/2)+levybar;
+            $(".concrete-scene-canvas").css({"position":"relative","top":(clientwindow[1]-basicsizes[1])/2,"left":left});
+            function zoom(event) {
+                var mensi=0.9;
+                if(event.deltaY<0){
+                    scaleratio=mensi
+                }
+                else{
+                    scaleratio=1/mensi;
+                }
+                var sirka=$(".concrete-scene-canvas").css("width").replace("px","")*scaleratio;
+                var vyska=$(".concrete-scene-canvas").css("height").replace("px","")*scaleratio;
+                if(!posun){
+                    if($(".rightPanel").css("display")=="none"){
+                        var pravybar=0;
+                    }
+                    else{
+                        var pravybar=$(".rightPanel").css("width").replace("px","");
+                    }
+                    if($(".tools").css("display")=="none"){
+                        var levybar=0;
+                    }
+                    else{
+                        var levybar=parseInt($(".tools").css("width").replace("px",""));
+                    }
+                    var left=((clientwindow[0]-pravybar-levybar-sirka)/2)+levybar;
+                    $(".concrete-scene-canvas").css({"position":"relative","width":sirka,"height":vyska,"top":(clientwindow[1]-vyska)/2,"left":left});
+                }
+                else{
+                    $(".concrete-scene-canvas").css({"position":"relative","width":sirka,"height":vyska});
+                }
                 canvas.render();
             }
-            let clientwindow=[$(".workspace").css("width").replace("px",""),$(".workspace").css("height").replace("px","")];
             let scaleratio = 1;
             document.onwheel = zoom;
         </script>
-        
+        <script>
+        var mouse=[];
+        var mousebefore=[]
+        let posun=false;
+        var down = false;
+        $(document).mousedown(function() {
+            down = true;
+            $(".dropzoned").css({"width":0,"height":0});
+        }).mouseup(function() {
+            down = false;  
+            $(".dropzoned").css({"width":100+"vw","height":100+"vh"});
+            mousebefore=[];
+            mouse=[];
+        });
+        document.onmousemove = function(e){
+            if($(".btn-tools-active").hasClass("hand")){
+                if(down){
+                    if(mousebefore!=[]){
+                        mousebefore=mouse;
+                        mouse=[e.clientX,e.clientY];
+                    }
+                    else{
+                        mouse=[e.clientX,e.clientY];
+                        mousebefore=mouse;
+                        posun=true;
+                    }
+                    rozdily=mousebefore[1]-mouse[1];
+                    rozdilx=mousebefore[0]-mouse[0];
+                    $(".concrete-scene-canvas").css({"top":( $(".concrete-scene-canvas").css("top").replace("px","")-rozdily),"left":( $(".concrete-scene-canvas").css("left").replace("px","")-rozdilx)});
+                    console.log(mouse);
+                }
+            }
+        }
+          </script>
 </html>

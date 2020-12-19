@@ -5,6 +5,9 @@ body,html{
     margin:0;
     background-color:#0b0b0b;
 font-family: 'Roboto', sans-serif;
+width: 100vw;
+height:10vh;
+overflow: hidden;
 }
 
 /* loading screen */
@@ -360,6 +363,9 @@ cursor: pointer;
     .btn-tools img{
         max-width: 30px;
         max-height: 25px;
+    }
+    .btn-tools-active{
+        background-color: rgba(255,255,255,1);
     }
     .toolBar{
         width:140px;

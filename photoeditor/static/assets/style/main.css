@@ -5,6 +5,9 @@ body, html {
   margin: 0;
   background-color: #0b0b0b;
   font-family: 'Roboto', sans-serif;
+  width: 100vw;
+  height: 10vh;
+  overflow: hidden;
 }
 
 /* loading screen */
@@ -416,6 +419,10 @@ body, html {
 .btn-tools img {
   max-width: 30px;
   max-height: 25px;
+}
+
+.btn-tools-active {
+  background-color: white;
 }
 
 .toolBar {
