@@ -980,8 +980,8 @@ function hexToRgb(hex) {
                     else{
                         mouse=[e.clientX,e.clientY];
                         mousebefore=mouse;
-                        posun=true;
                     }
+                    posun=true;
                     rozdily=mousebefore[1]-mouse[1];
                     rozdilx=mousebefore[0]-mouse[0];
                     $(".concrete-scene-canvas").css({"top":( $(".concrete-scene-canvas").css("top").replace("px","")-rozdily),"left":( $(".concrete-scene-canvas").css("left").replace("px","")-rozdilx)});
