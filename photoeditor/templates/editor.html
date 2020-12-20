@@ -156,9 +156,9 @@
         <div class="toolBar">
             <div class="show tools">
                 <button class="btn-tools hand"><img src="{% static 'assets/icons/hand.png' %}"></button>
-                <button class="btn-tools rotation"><img src="{% static 'assets/icons/hand.png' %}"></button>
-                <button class="btn-tools"><img src="{% static 'assets/icons/hand.png' %}"></button>
-                <button class="btn-tools"><img src="{% static 'assets/icons/hand.png' %}"></button>
+                <button class="btn-tools rotation"><img src="{% static 'assets/icons/rotate.png' %}"></button>
+                <button class="btn-tools crop"><img src="{% static 'assets/icons/crop.png' %}"></button>
+                <button class="btn-tools"><img src="{% static 'assets/icons/pointer.png' %}"></button>
             </div> 
             <div class="showing">
                 <div class="closeTools hide" onclick="show('tools','left')">
@@ -259,7 +259,9 @@ function imagedata_to_image(imagedata,i) {
                     });
                 }
                 createLayer(name,size){
+                    console.log(size);
                     size= size||this.size;
+                    console.log(size);
                     var newLayer= new Layer(size,name,this.layers.length);
                     this.viewport.add(newLayer.layer);
                     this.layers.push(newLayer);
@@ -421,12 +423,15 @@ function imagedata_to_image(imagedata,i) {
                 ImageDataStarted(){
                     this.layerImage=this.layer.scene.context.getImageData(0,0,this.size[0],this.size[1]);
                     this.layerData=this.layerImage.data;
+                    this.rgb=[];
+                    this.alpha=[]
                     for(var i=0; i<this.size[0]*this.size[1]*4;i=i+4){
                         this.rgb.push(this.layerData[i]);
                         this.rgb.push(this.layerData[i+1]);
                         this.rgb.push(this.layerData[i+2]);
                         this.alpha.push(this.layerData[i+3]);
                     }
+                    this.ImageData();
                 }
                 RGBtoYCbCr(){
                     var width = this.size[0];
@@ -513,9 +518,8 @@ function imagedata_to_image(imagedata,i) {
                     canvas.render();
                 }
                 rotate(angle){
-                    var xnew=x*Math.cos(angle)-y*Math.sin(angle);
-                    var ynew=x*Math.sin(angle)+y*Math.cos(angle);
-
+                    this.layer.scene.context.rotate(angle * Math.PI / 180);
+                    this.ImageData();
                 }
                 contrast(){
                     return true;
@@ -569,7 +573,6 @@ function imagedata_to_image(imagedata,i) {
                         return arr;
                     }
                     removeItemOnce(canvas.layers,this);
-                    canvas.render();
                 }
             }
 
@@ -588,14 +591,6 @@ let canvas = new Canvas(size);
 let DFBGColor=[];
 canvas.createLayer("Background");
 
-
-
-/* brightness add*/
-$("#brightness").on("change",async function(){
-            var layer=canvas.layers[1];
-            layer.brightness($(this).val());
-            canvas.render();
-});
 </script>
 
 
@@ -654,31 +649,6 @@ $(".histbut").on('click',function () {
         
 });
         
-        </script>
-        <script>
-            function upravafotky(){
-                var brightnessvalue=$("#brightness").val()/100;
-                var contrastvalue=$("#contrast").val()/100;
-                var rotate = $("#rotation").val();
-                canvas.layers[1].brightness(brightnessvalue);
-                canvas.render();
-                $(".loading").hide();
-            }
-            //sliders
-            $(".slider").on("change",function(){
-                $(".loading").toggle();
-                $("#contrastn").val($("#contrast").val());
-                $("#brightnessn").val($("#brightness").val());
-                $("#rotationn").val($("#rotation").val());
-                upravafotky();
-                });
-            $(".numbersofslider").on("change",function(){
-                $(".loading").toggle();
-                $("#contrast").val($("#contrastn").val());
-                $("#brightness").val($("#brightnessn").val());
-                $("#rotation").val($("#rotationn").val());
-                upravafotky();
-                });
         </script>
          <script>$(".loading").hide();</script>
          <script>
@@ -813,6 +783,7 @@ function hexToRgb(hex) {
             });
             function deleteLayer(id){
                 canvas.layers[id].delete();
+                canvas.render();
             }
 
             $(document).on('click', '.layerShowing', function () {
@@ -961,15 +932,71 @@ function hexToRgb(hex) {
         var mousebefore=[]
         let posun=false;
         var down = false;
-        $(document).mousedown(function() {
+        var cropstart=[];
+        var cropend=[];
+        /* je zmačkutá myš? */
+        document.ondblclick = function(event){
+            clientwindow=[$(".workspace").css("width").replace("px",""),$(".workspace").css("height").replace("px","")];
+            var basicsizes=[1000,500];
+            $(".concrete-scene-canvas").css("width",basicsizes[0]);
+            $(".concrete-scene-canvas").css("height",basicsizes[1]);
+            if($(".rightPanel").css("display")=="none"){
+                    var pravybar=0;
+                }
+                else{
+                    var pravybar=$(".rightPanel").css("width").replace("px","");
+                }
+                if($(".tools").css("display")=="none"){
+                    var levybar=0;
+                }
+                else{
+                    var levybar=parseInt($(".tools").css("width").replace("px",""));
+                }
+                var left=((clientwindow[0]-pravybar-levybar-basicsizes[0])/2)+levybar;
+            $(".concrete-scene-canvas").css({"position":"relative","top":(clientwindow[1]-basicsizes[1])/2,"left":left});
+        posun=false};
+        $(document).mousedown(function(event) {
             down = true;
             $(".dropzoned").css({"width":0,"height":0});
-        }).mouseup(function() {
+            if($(".btn-tools-active").hasClass("crop")){
+                cropstart=[event.clientX,event.clientY];
+            }
+        }).mouseup(function(event) {
             down = false;  
             $(".dropzoned").css({"width":100+"vw","height":100+"vh"});
             mousebefore=[];
             mouse=[];
+            if($(".btn-tools-active").hasClass("crop")){
+                cropend=[event.clientX,event.clientY];
+                let myCanvas = document.createElement('canvas');
+                var id = $(".activeLayer").attr("layer-id");
+                var imgData=canvas.layers[id].layerImage;
+                var scaleRatio=canvas.viewport.width/$(".concrete-scene-canvas").css("width").replace("px","");
+                console.log(scaleRatio);
+                var sirka=(cropend[0]-cropstart[0])*scaleRatio;
+                var vyska=(cropend[1]-cropstart[1])*scaleRatio;
+                console.log(sirka,vyska);
+                myCanvas.width = imgData.width;
+                myCanvas.height = imgData.height;
+                let myContext = myCanvas.getContext("2d");
+                myContext.putImageData(imgData,0,0)
+                myCanvas = cropCanvas(myCanvas,0,0,sirka,vyska);
+                var Imgdata = myCanvas.toDataURL("image/png");
+                canvas.createLayer("layer "+id+" croped",[sirka,vyska]); 
+                canvas.layers[canvas.layers.length-1].alphaProcesingData=canvas.layers[id].alphaProcesingData;
+                var img =new Image();
+                img.id="img";
+                img.src=Imgdata;
+                setTimeout(() => {  
+                    canvas.layers[id].delete();
+                    canvas.layers[canvas.layers.length-1].importImage(img);
+                    canvas.render();
+                        }, 200);
+                cropstart=[];
+                cropend=[];
+            }
         });
+        /* pohyb s canvasem pokud je zapnuta ruka */
         document.onmousemove = function(e){
             if($(".btn-tools-active").hasClass("hand")){
                 if(down){
@@ -988,6 +1015,19 @@ function hexToRgb(hex) {
                     console.log(mouse);
                 }
             }
+            if($(".btn-tools-active").hasClass("hand")){
+
+            }
         }
-          </script>
+
+        /* crop */
+        const cropCanvas = (sourceCanvas,left,top,width,height) => {
+            let destCanvas = document.createElement('canvas');
+            destCanvas.width = width;
+            destCanvas.height = height;
+            destCanvas.getContext("2d").drawImage(sourceCanvas,left,top,width,height,0,0,width,height);      // newCanvas, same size as source rect
+            return destCanvas;
+        }
+        
+        </script>
 </html>
