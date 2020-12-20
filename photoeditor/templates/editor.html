@@ -19,10 +19,8 @@
             google.charts.setOnLoadCallback(drawChart);
 
             let options = {
-                title: 'Histogram',
                 legend: 'none',
                 backgroundColor: { fill:'transparent' },
-                hAxis: {title: 'Hodnoty',  titleTextStyle: {color: '#333'}},
                 vAxis: {viewWindow: {
                 min: 0,
                 max:20000
@@ -64,32 +62,32 @@
             </div>
         </div>
         -->
-        <div class="infoBackground">
-            <div class="infoTable">
-                <div class="navbarInfo">
+        <div class="infoBackground windowBackground">
+            <div class="windowTable">
+                <div class="navbarWindow">
                     <button class="infoHide">X</button>
                     <button class="minimalize" data-name="info">_</button>
                 </div>
-                <div class="infoTableBody">
+                <div class="windowTableBody">
                     <h1>{{preklad.ap.nadpis}}</h1>
                     <h2>{{preklad.ap.podnadpis}}</h2>
                     <h3>{{preklad.ap.vedouci}}</h3>
                     <p>{{preklad.ap.text}}<p>
                     <p>Celý projekt na <a href="https://github.com/matej-marek/Absolventsky_projekt" target="_blank">GitHubu</a>.</p>
                 </div>
-                <div class="infoTableFooter">
+                <div class="windowTableFooter">
                     <p>{{preklad.ap.verze}} {{verze}} | {{preklad.ap.datum}} {{datum_vydani}}</p>
                     <p>Commit {{commitZkraceny}}</p>
                 </div>
             </div>
         </div>
-        <div class="settingBackground">
-            <div class="settingTable">
-                <div class="navbarSetting">
+        <div class="settingBackground windowBackground">
+            <div class="windowTable">
+                <div class="navbarWindow">
                     <button class="settingHide">X</button>
                     <button class="minimalize" data-name="setting">_</button>
                 </div>
-                <div class="settingTableBody">
+                <div class="windowTableBody">
                     <p>Close side bars<input id="closeSides" type="checkbox"></p>
                     <p>Default background color<input id="dfbgcolor" type="color"></p>
                     <p>Default saving file<input id="savingFromat" type="text"></p>
@@ -99,24 +97,58 @@
                         <option value="png">png</option>
                     </select>
                 </div>
-                <div class="settingTableFooter">
+                <div class="windowTableFooter">
                     <p>{{preklad.ap.verze}} {{verze}} | {{preklad.ap.datum}} {{datum_vydani}}</p>
                     <p>Commit {{commitZkraceny}}</p>
                 </div>
             </div>
         </div>
-        <div class="uploadProjectBackground">
-            <div class="uploadProjectTable">
-                <div class="navbarUploadProject">
+        <div class="uploadProjectBackground windowBackground">
+            <div class="windowTable">
+                <div class="navbarWindow">
                     <button class="uploadProjectHide">X</button>
-                    <button class="minimalize" data-name="upload_project">_</button>
+                    <button class="minimalize" data-name="windows">_</button>
                 </div>
-                <div class="uploadProjectTableBody">
+                <div class="windowTableBody">
                     <input type="file" name="inputfile" id="inputfile"> 
                     <br> 
                     <pre id="output"></pre> 
                 </div>
-                <div class="uploadProjectTableFooter">
+                <div class="windowTableFooter">
+                    <p>{{preklad.ap.verze}} {{verze}} | {{preklad.ap.datum}} {{datum_vydani}}</p>
+                    <p>Commit {{commitZkraceny}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="toolsBackground windowBackground">
+            <div class="windowTable">
+                <div class="navbarWindow">
+                    <button class="toolsHide">X</button>
+                    <button class="minimalize" data-name="tools">_</button>
+                </div>
+                <div class="windowTableBody">
+                    <input type="file" name="inputfile" id="inputfile"> 
+                    <br> 
+                    <pre id="output"></pre> 
+                </div>
+                <div class="windowTableFooter">
+                    <p>{{preklad.ap.verze}} {{verze}} | {{preklad.ap.datum}} {{datum_vydani}}</p>
+                    <p>Commit {{commitZkraceny}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="windowsBackground windowBackground">
+            <div class="windowTable">
+                <div class="navbarWindow">
+                    <button class="windowsHide">X</button>
+                    <button class="minimalize" data-name="windows">_</button>
+                </div>
+                <div class="windowTableBody">
+                    <input type="file" name="inputfile" id="inputfile"> 
+                    <br> 
+                    <pre id="output"></pre> 
+                </div>
+                <div class="windowTableFooter">
                     <p>{{preklad.ap.verze}} {{verze}} | {{preklad.ap.datum}} {{datum_vydani}}</p>
                     <p>Commit {{commitZkraceny}}</p>
                 </div>
@@ -140,16 +172,7 @@
                 <button class="info btn-nav">{{preklad.button.info}}</button>
                 <button class="windows btn-nav">{{preklad.button.windows}}</button>
                 <button class="tool btn-nav">{{preklad.button.tools}}</button>
-                <button class="uploading btn-nav">{{preklad.button.upload}}</button>
                 <button class="setting btn-nav">{{preklad.button.setting}}</button>
-                <div class="dropdown">
-                    <button class="btn-nav">{{lang}}</button>
-                    <div class="dropdown-content cv">
-                        {% for lan in langs %}
-                    <a href="/{{lan}}/">{{lan}}</a>
-                        {% endfor %}
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -232,7 +255,11 @@
         </script>
 
 <script>
-
+function text2Binary(string) {
+    return string.split('').map(function (char) {
+        return char.charCodeAt(0).toString(2);
+    }).join(' ');
+}
 function imagedata_to_image(imagedata,i) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
@@ -533,6 +560,7 @@ function imagedata_to_image(imagedata,i) {
                     return true;
                 }
                 importImage(myImage){
+                    $(".center").html("");
                     this.layer.scene.context.drawImage(myImage,0,0,this.size[0],this.size[1]);
                     this.ImageDataStarted();
                 }
@@ -573,6 +601,9 @@ function imagedata_to_image(imagedata,i) {
                         return arr;
                     }
                     removeItemOnce(canvas.layers,this);
+                    if(canvas.layers.length==0){
+                        $(".center").html("<h1>{{preklad.dropdown.screen}}</h1>")
+                    }
                 }
             }
 
@@ -827,7 +858,6 @@ function hexToRgb(hex) {
                 var text= "@version "+"{{verze}}"+"\n";
                 text+="@layer-number: "+canvas.layers.length+"\n";
                 for(var i=0;i<canvas.layers.length;i++){
-                    console.log(canvas.layers[i].layer);
                     text+="@layer-"+i+" \n#data: "+canvas.layers[i].layer.scene.canvas.toDataURL("image/png")+"\n";
                 }
                 var blob = new Blob([text],
@@ -1015,9 +1045,6 @@ function hexToRgb(hex) {
                     console.log(mouse);
                 }
             }
-            if($(".btn-tools-active").hasClass("hand")){
-
-            }
         }
 
         /* crop */
@@ -1028,6 +1055,5 @@ function hexToRgb(hex) {
             destCanvas.getContext("2d").drawImage(sourceCanvas,left,top,width,height,0,0,width,height);      // newCanvas, same size as source rect
             return destCanvas;
         }
-        
         </script>
 </html>

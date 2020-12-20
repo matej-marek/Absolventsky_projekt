@@ -39,9 +39,8 @@ overflow: hidden;
 
 
 
-
-/*infotable */ 
-.infoTable{
+/*windows */ 
+.windowTable{
     width:50vw;
     height: 50vh;
     position: absolute;
@@ -51,7 +50,7 @@ overflow: hidden;
     z-index: 100;
     color: #d0d0d0;
 }
-.infoBackground{
+.windowBackground{
     width:100%;
     height:100%;
     position:absolute;
@@ -60,12 +59,12 @@ overflow: hidden;
     background-color: rgba(20,20,20,0.5);
     z-index:100;
 }
-.navbarInfo{
+.navbarWindow{
     width:100%;
     height: 20px;
     background-color: #404040;
 }
-.navbarInfo button{
+.navbarWindow button{
     float:right;
     height:100%;
     width:50px;
@@ -73,16 +72,16 @@ overflow: hidden;
     border:none;
 
 }
-.navbarInfo button:hover{
+.navbarWindow button:hover{
     background-color: #ff1010;
 }
-.infoTableBody h1,h2,h3{
+.windowTableBody h1,h2,h3{
     text-align: center;
 }
-.infoTableBody p{
+.windowTableBody p{
     margin: 0 20px;
 }
-.infoTableFooter{
+.windowTableFooter{
     position: absolute; 
     bottom: 0px; 
     left:0px;
@@ -91,11 +90,11 @@ overflow: hidden;
     background-color: #454545;
     text-align: center;
 }
-.infoTableFooter p{
+.windowTableFooter p{
    margin: 0;
 }
 @media only screen and (max-width: 800px) {
-    .infoTable{
+    .windowTable{
         width:400px;
         height: 400px;
         position: absolute;
@@ -106,144 +105,6 @@ overflow: hidden;
         color: #d0d0d0;
     }
 }
-
-/*settings table */ 
-.settingTable{
-    width:50vw;
-    height: 50vh;
-    position: absolute;
-    top: 25vh;
-    left: 25vw;
-    background-color: #505050;
-    z-index: 100;
-    color: #d0d0d0;
-}
-.settingBackground{
-    width:100%;
-    height:100%;
-    position:absolute;
-    top:0;
-    left:0;
-    background-color: rgba(20,20,20,0.5);
-    z-index:100;
-}
-.navbarSetting{
-    width:100%;
-    height: 20px;
-    background-color: #404040;
-}
-.navbarSetting button{
-    float:right;
-    height:100%;
-    width:50px;
-    background-color: #ff5050;
-    border:none;
-
-}
-.navbarsetting button:hover{
-    background-color: #ff1010;
-}
-.settingTableBody h1,h2,h3{
-    text-align: center;
-}
-.settingTableBody p{
-    margin: 0 20px;
-}
-.settingTableFooter{
-    position: absolute; 
-    bottom: 0px; 
-    left:0px;
-    width:100%;
-    height:40px;
-    background-color: #454545;
-    text-align: center;
-}
-.settingTableFooter p{
-   margin: 0;
-}
-@media only screen and (max-width: 800px) {
-    .settingTable{
-        width:400px;
-        height: 400px;
-        position: absolute;
-        top: calc(50vh - 200px);
-        left: calc(50vw - 200px);
-        background-color: #505050;
-        z-index: 100;
-        color: #d0d0d0;
-    }
-}
-
-/*upload project table */ 
-.uploadProjectTable{
-    width:50vw;
-    height: 50vh;
-    position: absolute;
-    top: 25vh;
-    left: 25vw;
-    background-color: #505050;
-    z-index: 100;
-    color: #d0d0d0;
-}
-.uploadProjectBackground{
-    width:100%;
-    height:100%;
-    position:absolute;
-    top:0;
-    left:0;
-    background-color: rgba(20,20,20,0.5);
-    z-index:100;
-}
-.uploadProjectSetting{
-    width:100%;
-    height: 20px;
-    background-color: #404040;
-}
-.uploadProjectSetting button{
-    float:right;
-    height:100%;
-    width:50px;
-    background-color: #ff5050;
-    border:none;
-
-}
-.navbarUploadProject button:hover{
-    background-color: #ff1010;
-}
-.uploadProjectTableBody h1,h2,h3{
-    text-align: center;
-}
-.uploadProjectTableBody p{
-    margin: 0 20px;
-}
-.uploadProjectTableFooter{
-    position: absolute; 
-    bottom: 0px; 
-    left:0px;
-    width:100%;
-    height:40px;
-    background-color: #454545;
-    text-align: center;
-}
-.uploadProjectTableFooter p{
-   margin: 0;
-}
-@media only screen and (max-width: 800px) {
-    .uploadProjectTable{
-        width:400px;
-        height: 400px;
-        position: absolute;
-        top: calc(50vh - 200px);
-        left: calc(50vw - 200px);
-        background-color: #505050;
-        z-index: 100;
-        color: #d0d0d0;
-    }
-}
-
-
-
-
 
 .horni-bar{
     width:100vw;
