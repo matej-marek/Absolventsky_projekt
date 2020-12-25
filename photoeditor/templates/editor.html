@@ -181,7 +181,8 @@
                 <button class="btn-tools hand"><img src="{% static 'assets/icons/hand.png' %}"></button>
                 <button class="btn-tools rotation"><img src="{% static 'assets/icons/rotate.png' %}"></button>
                 <button class="btn-tools crop"><img src="{% static 'assets/icons/crop.png' %}"></button>
-                <button class="btn-tools"><img src="{% static 'assets/icons/pointer.png' %}"></button>
+                <button class="btn-tools pointer"><img src="{% static 'assets/icons/pointer.png' %}"></button>
+                <button class="btn-tools brush"><img src="{% static 'assets/icons/brush.png' %}"></button>
             </div> 
             <div class="showing">
                 <div class="closeTools hide" onclick="show('tools','left')">
@@ -282,7 +283,8 @@ function imagedata_to_image(imagedata,i) {
                     this.viewport = new Concrete.Viewport({
                     width: size[0],
                     height: size[1],
-                    container: foto
+                    container: foto,
+
                     });
                 }
                 createLayer(name,size){
@@ -459,6 +461,7 @@ function imagedata_to_image(imagedata,i) {
                         this.alpha.push(this.layerData[i+3]);
                     }
                     this.ImageData();
+                    console.log(this.layerImage)
                 }
                 RGBtoYCbCr(){
                     var width = this.size[0];
@@ -572,6 +575,27 @@ function imagedata_to_image(imagedata,i) {
                   this.layer.scene.context.fillStyle = "rgba("+r+","+g+","+b+","+a+")";
                   this.layer.scene.context.fillRect(0, 0, this.size[0],this.size[1]);
                   this.ImageDataStarted();
+                }
+                brush(point,diameter){
+                    diameter=diameter||5;
+                    var color=[255,255,255,255]
+                    for(var y=-diameter;y<=diameter;y++){
+                        var x  = Math.round(Math.sqrt(Math.abs(Math.pow(diameter,2)- Math.pow((y+point[1]-point[1]),2)))+point[0]);
+                        if(x!=point[0]){
+                            for(var z=-1*(x-point[0]);z<=(x-point[0]);z++){
+                                for(var i=0; i<4;i++){
+                                    this.layerData[y*(z+point[0])+i]=color[i];
+                                }
+                            }
+                        }
+                        else{
+                            for(var i=0; i<4;i++){
+                                this.layerData[y*x+i]=color[i];
+                            }
+                        }
+                    }
+                    this.layer.scene.context.putImageData(this.layerImage,0,0);
+                    canvas.render();
                 }
                 down(){
                   this.layer.moveDown();
@@ -991,6 +1015,10 @@ function hexToRgb(hex) {
             if($(".btn-tools-active").hasClass("crop")){
                 cropstart=[event.clientX,event.clientY];
             }
+            if($(".btn-tools-active").hasClass("brush")){
+                var id = $(".activeLayer").attr("layer-id");
+                canvas.layers[id].brush([event.clientX,event.clientY],10);
+            }
         }).mouseup(function(event) {
             down = false;  
             $(".dropzoned").css({"width":100+"vw","height":100+"vh"});
@@ -1001,10 +1029,12 @@ function hexToRgb(hex) {
                 let myCanvas = document.createElement('canvas');
                 var id = $(".activeLayer").attr("layer-id");
                 var imgData=canvas.layers[id].layerImage;
-                var scaleRatio=canvas.viewport.width/$(".concrete-scene-canvas").css("width").replace("px","");
-                console.log(scaleRatio);
-                var sirka=(cropend[0]-cropstart[0])*scaleRatio;
-                var vyska=(cropend[1]-cropstart[1])*scaleRatio;
+                var scaleRatiosirka=canvas.viewport.width/$(".concrete-scene-canvas").css("width").replace("px","");
+                var scaleRatiovyska=canvas.viewport.height/$(".concrete-scene-canvas").css("height").replace("px","");
+                var sirka=(cropend[0]-cropstart[0])*scaleRatiosirka;
+                var vyska=(cropend[1]-cropstart[1])*scaleRatiovyska;
+                var levo=cropstart[0]-$(".concrete-scene-canvas").css("width").replace("px","");
+                var top=cropstart[1]-$(".concrete-scene-canvas").css("height").replace("px","");
                 console.log(sirka,vyska);
                 myCanvas.width = imgData.width;
                 myCanvas.height = imgData.height;
