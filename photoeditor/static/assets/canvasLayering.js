@@ -1,17 +1,3 @@
-{% load static%}
-<html>
-    <head>
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    </head>
-    <body>
-        <div id="workspace">
-        </div>
-        <div id="hist">
-        </div>
-        <div id="layers">
-        </div>
-        <script>/* canvas class */
-/* canvas class */
 class Layer{
     constructor(size,name,whole,position){
         this.size=size;
@@ -38,17 +24,24 @@ class Layer{
         this.context.clearRect(0, 0, this.size[0], this.size[1])
     }
     importImage(data){
-        var img = new Image();
-        var that= this;
-        img.src=data;
-        img.id="foto";
-        var pomer=img.width/img.height;
-        setTimeout(function(){ 
-        that.context.drawImage(img,0,0,that.size[0],that.size[1]);
-        that.whole.render(); 
-        that.ImageDataStarted();
-        }, 200);
-        
+        if(typeof(data)=="object"){
+            this.context.drawImage(data,0,0,this.size[0],this.size[1]);
+            this.whole.render(); 
+            this.ImageDataStarted();
+        }
+        else{
+            var img = new Image();
+            var that= this;
+            img.src=data;
+            img.id="foto";
+            var pomer=img.width/img.height;
+            setTimeout(function(){ 
+            that.context.drawImage(img,0,0,that.size[0],that.size[1]);
+            that.whole.render(); 
+            that.ImageDataStarted();
+            }, 200);
+
+        }
     }
     up(){
         if(this.positionLayer!=this.whole.layers.length){
@@ -86,9 +79,10 @@ class Layer{
         height=height||this.size[1];
         left=left||0;
         top=top||0;
-        this.context.fillStyle = "#"+r.toString(16).toUpperCase()+g.toString(16).toUpperCase()+b.toString(16).toUpperCase();
+        this.context.fillStyle = "rgb("+r+","+g+","+b+")";
         this.context.fillRect(left,top,width,height);
         this.whole.render();
+        this.ImageDataStarted();
     }
     RGBtoYCbCr(){
         var width = this.size[0];
@@ -299,7 +293,7 @@ class Canvas{
                 datas.push([i,0]); 
             }
             var data = google.visualization.arrayToDataTable(datas);
-            var divHist='<div class="histograms"><div class="btns-hist"><button onclick="changeHistColor(this)" class="canvasLayeringBtnHist cLBHActive" data-type="y">Y</button><button  onclick="changeHistColor(this)"  class="canvasLayeringBtnHist" data-type="r">R</button><button onclick="changeHistColor(this)"  class="canvasLayeringBtnHist" data-type="g">G</button><button onclick="changeHistColor(this)" class="canvasLayeringBtnHist" data-type="b">B</button></div><div id="CLHistogram"></div></div>';
+            var divHist='<div class="btns-hist"><button onclick="changeHistColor(this)" class="canvasLayeringBtnHist cLBHActive" data-type="y">Y</button><button  onclick="changeHistColor(this)"  class="canvasLayeringBtnHist" data-type="r">R</button><button onclick="changeHistColor(this)"  class="canvasLayeringBtnHist" data-type="g">G</button><button onclick="changeHistColor(this)" class="canvasLayeringBtnHist" data-type="b">B</button></div><div id="CLHistogram"></div>';
             document.getElementById(div).innerHTML+=divHist;
             setTimeout(function(){
             that.chart = new google.visualization.AreaChart(document.getElementById("CLHistogram"));
@@ -338,6 +332,8 @@ class Canvas{
         }
     }
     layershow(divLayers){
+        divLayers=divLayers||this.layersShowDiv;
+        this.layersShowDiv=divLayers;
         var layers=document.getElementById(divLayers);
         var activeLayer=document.getElementsByClassName("activeLayer").length;
         if(activeLayer>0){
@@ -384,14 +380,7 @@ class Canvas{
             else{
                 div.innerHTML+="<button class='layerVisibility' layer-id='"+i+"'><svg width='24' height='24' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' clip-rule='evenodd'><path d='M8.137 15.147c-.71-.857-1.146-1.947-1.146-3.147 0-2.76 2.241-5 5-5 1.201 0 2.291.435 3.148 1.145l1.897-1.897c-1.441-.738-3.122-1.248-5.035-1.248-6.115 0-10.025 5.355-10.842 6.584.529.834 2.379 3.527 5.113 5.428l1.865-1.865zm6.294-6.294c-.673-.53-1.515-.853-2.44-.853-2.207 0-4 1.792-4 4 0 .923.324 1.765.854 2.439l5.586-5.586zm7.56-6.146l-19.292 19.293-.708-.707 3.548-3.548c-2.298-1.612-4.234-3.885-5.548-6.169 2.418-4.103 6.943-7.576 12.01-7.576 2.065 0 4.021.566 5.782 1.501l3.501-3.501.707.707zm-2.465 3.879l-.734.734c2.236 1.619 3.628 3.604 4.061 4.274-.739 1.303-4.546 7.406-10.852 7.406-1.425 0-2.749-.368-3.951-.938l-.748.748c1.475.742 3.057 1.19 4.699 1.19 5.274 0 9.758-4.006 11.999-8.436-1.087-1.891-2.63-3.637-4.474-4.978zm-3.535 5.414c0-.554-.113-1.082-.317-1.562l.734-.734c.361.69.583 1.464.583 2.296 0 2.759-2.24 5-5 5-.832 0-1.604-.223-2.295-.583l.734-.735c.48.204 1.007.318 1.561.318 2.208 0 4-1.792 4-4z'/></svg></button>";
             }
-            var bg = document.createElement("img");
-            bg.className="imageBackground";
-            bg.src= "{%static 'assets/icons/transparent.jpg'%}";
-            bg.width=img.width;
-            bg.height=img.height;
-            bg.id="background-img"+i;
             div.appendChild(img);
-            div.appendChild(bg);
             div.innerHTML+=oldData;
             x++;               
         }
@@ -426,15 +415,3 @@ function imagedata_to_image(imagedata,i) {
     image.className="layerImage";
     return image;
 }
-
-let canvas = new Canvas([1920,1080],"workspace","width:1000; height:500;");
-var layer=canvas.createLayer();
-layer.importImage("/static/photos/upravene/main.jpg");
-var layer=canvas.createLayer();
-layer.importImage("/static/photos/upravene/main.jpg");
-setTimeout(function(){canvas.showHistogram("hist");},250);
-setTimeout(function(){canvas.render();},5000);
-setTimeout(function(){canvas.layershow("layers");},10000);
-        </script>
-    </body>
-</html>
