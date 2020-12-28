@@ -135,7 +135,7 @@ def photoeditor(request,lang):
         commitZkraceny=commit[:7]
         # přidání překladů do contextů
         preklad=json.loads(translations.translation(lang))
-        context={"commit":commit,"commitZkraceny":commitZkraceny,"verze":"0.6.3", "datum_vydani":"25.12.2020", "lang":lang,"langs":langs}
+        context={"commit":commit,"commitZkraceny":commitZkraceny,"verze":"1.0.1", "datum_vydani":"28.12.2020", "lang":lang,"langs":langs}
         context.update(preklad)
         return render(request, 'editor.html',context)
     else:
