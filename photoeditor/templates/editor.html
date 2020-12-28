@@ -60,6 +60,7 @@
                     <select name="savingFormat" id="savingFormat">
                         <option value="jpg">jpg</option>
                         <option value="png">png</option>
+                        <option value="webp">webp</option>
                     </select>
                 </div>
                 <div class="windowTableFooter">
@@ -132,7 +133,7 @@
                 <input type="text" id="nazev" class="nameProject"value="{{preklad.project.default}}">
                 <button class="save btn-nav" download="" href="">{{preklad.button.save}}</button>
                 <button class="open btn-nav">{{preklad.button.open}}</button>
-                <button class="download btn-nav">{{preklad.button.download}}</button>
+                <button class="downloads btn-nav">{{preklad.button.download}}</button>
                 <button class="info btn-nav">{{preklad.button.info}}</button>
                 <button class="windows btn-nav">{{preklad.button.windows}}</button>
                 <button class="tool btn-nav">{{preklad.button.tools}}</button>
@@ -413,19 +414,9 @@ function hexToRgb(hex) {
                 var id= $(".activeLayer").attr("layer-id");
                 canvas.layers[id].alphaProcesing($(this).val());
             });
-            $(".download").click(function(){
-                var datafrom = document.querySelector("#canvas-layers");
-                var link = document.createElement('a');
-                var format=$("#savingFormat").val();
-                if(format=="jpg"){
-                    link.download = $(".nameProject").val()+'.jpg';
-                    link.href = datafrom.toDataURL("image/jpeg");
-                }
-                else{
-                    link.download = $(".nameProject").val()+'.png';
-                    link.href = datafrom.toDataURL("image/png");
-                }
-                link.click();
+            $(".downloads").click(function(){
+                console.log($(".nameProject").val());
+                canvas.download($(".nameProject").val());
             });
             $(".btn-tools").click(function(){
                 if($(".btn-tools-active")){
