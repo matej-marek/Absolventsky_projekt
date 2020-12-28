@@ -95,3 +95,37 @@ $(window).on('keydown',function(event){
         e.preventDefault();
     }
   });
+$("#histogramShow").on("change",function(){
+    $(".histograms").toggle();
+});
+$("#layersShow").on("change",function(){
+    $(".layers").toggle();
+});
+
+if(getCookie("sides")=='true'){
+  console.log("true");
+  show('tools','left');
+  show('rightPanel','right');
+
+  $("#closeSides").attr('checked',true)
+}
+if(getCookie("color")){
+  show('tools','left');
+  show('rightPanel','right');
+  var values=hexToRgb(getCookie("color"));
+  $("#dfbgcolor").val(getCookie("color"));
+  canvas.layers[0].createRect(values.r,values.g,values.b);
+}
+else{
+  canvas.layers[0].createRect(255,255,255);
+  $("#dfbgcolor").val("#ffffff");
+}
+$("#closeSides").on("change",function(){
+  var value=$("#closeSides").is(':checked');
+  setCookie("sides", value, 30);
+});
+$("#dfbgcolor").on("change",function(){
+  var value= $(this).val();
+  console.log(value);
+  setCookie("color", value, 30);
+});
