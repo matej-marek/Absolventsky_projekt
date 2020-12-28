@@ -129,3 +129,97 @@ $("#dfbgcolor").on("change",function(){
   console.log(value);
   setCookie("color", value, 30);
 });
+
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  var expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+$(".agree").on("click",function(){
+    $(this).parent().parent().parent().parent().remove();
+});
+/* záložky */
+$(".minimalize").on("click", function(){
+    var co = $(this).attr("data-name");
+    var zalozky = $(".zalozky");
+    var template=$("#zalozkaTemplate").html();
+    if(zalozky.children(".itemZalozky").attr("data-name")!=co){
+        zalozky.append(template);
+        zalozky.children(".itemZalozky").attr("data-name",co);
+        zalozky.children(".itemZalozky").children("p").html(co);
+        zalozky.children(".itemZalozky").children("button").attr("data-name",co);
+        $(this).parent().parent().parent().hide();
+    }
+});
+/* zavření záložky*/
+function closeItem(elmt){
+    $(elmt).parent().remove();
+}
+/* otevření záložky */
+function openItem(elmt){
+    var attr= $(elmt).attr("data-name");
+    if(attr=="info"){
+        $(".infoBackground").show();
+        $(elmt).parent().remove();
+    }
+    if(attr=="setting"){
+        $(".settingBackground").show();
+        $(elmt).parent().remove();
+    }
+}
+$(".openItem").click(function(){
+    console.log("ahoj");
+});
+function show(div,dir){
+  var obj = $("."+div);
+  obj.toggle(500,"swing");
+  }
+  $(".dropzoned").change(function () {
+    var reader = new FileReader();
+    var f = document.getElementById("file-select").files;
+    reader.onloadend = function () {
+        var data=reader.result;
+        originalimagedata =data;
+        var myImage = new Image();
+        myImage.src = data;
+        myImage.id="img";
+        setTimeout(() => {  
+        var width=myImage.width;
+        var height=myImage.height;
+        var pomer=width/height;
+        if(height>size[1]){
+            height=size[1];
+            width=pomer*size[1];
+        }
+        else if(width>size[0]){
+            width=size[0];
+            height=pomer*size[0];
+        }
+        
+        console.log(typeof(myImage));
+        canvas.createLayer("Layer "+canvas.layers.length,[width, height]);
+        canvas.layers[canvas.layers.length-1].importImage(myImage);
+        canvas.render();
+    }, 500);
+       
+    }
+    reader.readAsDataURL(f[0]);
+    
+});
+    

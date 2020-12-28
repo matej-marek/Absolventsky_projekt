@@ -488,3 +488,18 @@ function imagedata_to_image(imagedata,i) {
     image.className="layerImage";
     return image;
 }
+function makeColorLayer(hex){
+    hex=hex||"#ffffff";
+    var values=hexToRgb(hex);
+    canvas.createLayer("Layer "+canvas.layers.length);
+    canvas.layers[canvas.layers.length-1].BGcolor();
+    canvas.render();
+}
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  }
