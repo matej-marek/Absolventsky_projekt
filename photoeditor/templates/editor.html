@@ -191,8 +191,6 @@
 
         {% csrf_token %}        
     </body>
-    <script src="{% static 'assets/FileSaver.js'%}"> </script>
-    <script src="{% static 'assets/main.js'%}"> </script>
 
     <script>
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -207,7 +205,6 @@ var layer=canvas.createLayer("BG",[50,50]);
 layer.createRect(20,0,20,50,50,0,0);
 canvas.showHistogram("histograms","none");
 canvas.layershow("layers");
-
 </script>
 <script>$(".loading").hide();</script>
         <script>
@@ -378,9 +375,17 @@ canvas.layershow("layers");
             if($(".btn-tools-active").hasClass("crop")){
                 cropstart=[event.clientX,event.clientY];
             }
-            if($(".btn-tools-active").hasClass("brush")){
+            else if($(".btn-tools-active").hasClass("brush")){
                 var id = $(".activeLayer").attr("layer-id");
                 canvas.layers[id].brush([event.clientX,event.clientY],10);
+            }
+            else if($(".btn-tools-active").hasClass("pointer")){
+                var id = $(".activeLayer").attr("layer-id");
+                canvas.layers[id].setPosition(10,10);
+            }
+            else if($(".btn-tools-active").hasClass("rotation")){
+                var id = $(".activeLayer").attr("layer-id");
+                canvas.layers[id].rotate(10);
             }
         }).mouseup(function(event) {
             down = false;  
@@ -443,4 +448,6 @@ canvas.layershow("layers");
             return destCanvas;
         }
         </script>
+    <script src="{% static 'assets/FileSaver.js'%}"> </script>
+    <script src="{% static 'assets/main.js'%}"> </script>
 </html>

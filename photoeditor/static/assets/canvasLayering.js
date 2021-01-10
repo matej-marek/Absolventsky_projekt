@@ -81,8 +81,10 @@ class Layer{
     }
     //rotate layer
     rotate(angle){
-        this.layer.scene.context.rotate(angle * Math.PI / 180);
-        this.ImageData();
+        this.context.rotate(angle * Math.PI / 180);
+        this.clear();
+        this.context.drawImage(this.layerImage,this.position[0],this.position[1]);
+        this.whole.render();
     }
     //create rectangle in the layer
     createRect(r,g,b,width,height,left,top){
@@ -117,8 +119,17 @@ class Layer{
         this.ycbcr=ycbcr;
         this.ImageData();
     }
+    setPosition(x,y){
+        x=x||0;
+        y=y||0;
+        x=this.position[0]+x;
+        y=this.position[1]+y;
+        this.position=[x,y];
+        this.whole.render();
+    }
     // converr ycbcr to rgb
-    YCbCrtoRGB(){   
+    YCbCrtoRGB(render){
+        render=render||true;   
         var ycbcr=this.ycbcr;
         var rgb = this.rgb;
         for(var i=0;i<ycbcr.length;i=i+3){
@@ -126,7 +137,7 @@ class Layer{
             rgb[i+1]=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*-0.34414+(ycbcr[i+2]-128)*-0.71414);
             rgb[i+2]=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*1.772);
         }
-        this.ImageData();
+        this.ImageData(render);
     }
     // add or substract brightness of image in EV
     brightness(value){
@@ -184,7 +195,8 @@ class Layer{
         this.ImageData();
     }
     /* analyze and make Image Data for render */
-    ImageData(){
+    ImageData(render){
+        render=render||true;
         var width = this.size[0];
         var height= this.size[1];
         var pocethodnot= width*height*3;
@@ -197,7 +209,15 @@ class Layer{
             plus++;
         }
         this.context.putImageData(this.layerImage,0,0);
-        this.whole.render()
+        if(render){
+            this.whole.render()
+        }
+    }
+    chrka(){
+        for(var i=0;i<this.ycbcr.length;i=i+3){
+            this.ycbcr[i]=this.whole.chrka[this.ycbcr[i]];
+        }
+        this.YCbCrtoRGB(false);
     }
 }
 // whole canvas data layer
@@ -219,6 +239,11 @@ class Canvas{
         this.histView=false;
         this.chart="";
         this.options="";
+        this.chrka=[];
+        for(var i=0;i<256;i++){
+            var x=Math.min(i,10);
+            this.chrka.push(x);
+        }
         document.getElementById(workspace).appendChild(this.canvas);
     }
     // create layer in this canvas
@@ -256,11 +281,43 @@ class Canvas{
     render(){
         this.clearScene();
         var that= this;
+        var ycbcr=[];
+        var rgb=[];
+        var alpha=[];
         this.layers.forEach(function(layer){
             if(layer.visible){
-                that.context.drawImage(layer.canvas,0,0,layer.size[0],layer.size[1]);
+                that.context.drawImage(layer.canvas,layer.position[0],layer.position[1],layer.size[0],layer.size[1]);
             }
-        }); 
+        });
+        var image=this.context.getImageData(0,0,this.size[0],this.size[1]);
+        var rgba =image.data;
+        for(var i=0;i<rgba.length;i=i+4){
+            var r = rgba[i];
+            var g= rgba[i+1];
+            var b= rgba[i+2];
+            alpha.push(rgba[i+3]);
+            rgb.push(r);
+            rgb.push(g);
+            rgb.push(b);
+            var y = Math.floor(r*0.299+g*0.587+b*0.114);
+            var cb= Math.floor(r *(-0.16874)+g*(-0.33126)+ b*0.50000 + 128);
+            var cr=Math.floor(r*0.50000+g*(-0.41869)+ b*(-0.08131) + 128);
+            ycbcr.push(y,cb,cr);
+        }
+        for(var i=0;i<ycbcr.length;i=i+3){
+            ycbcr[i]=this.chrka[ycbcr[i]];
+        }
+        var data=[];
+        for(var i=0;i<ycbcr.length;i=i+3){
+            var r=Math.floor(ycbcr[i]+(ycbcr[i+2]-128)*1.402);
+            var g=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*-0.34414+(ycbcr[i+2]-128)*-0.71414);
+            var b=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*1.772);
+            data.push(r,g,b,alpha[i/3]);
+        }
+        for(var i=0;i<data.length;i++){
+            rgba[i]=data[i];
+        }
+        this.context.putImageData(image,0,0);
         if(this.histView){
             this.histogram();
         }
@@ -288,7 +345,10 @@ class Canvas{
             g[data[x+1]]++;
             b[data[x+2]]++;
         }
-        this.histogramData=[];
+        this.histogramDataY=[];
+        this.histogramDataR=[];
+        this.histogramDataG=[];
+        this.histogramDataB=[];
         this.histogramDataY.push(y);
         this.histogramDataR.push(r);
         this.histogramDataG.push(g);
