@@ -190,36 +190,4 @@ function show(div,dir){
   var obj = $("."+div);
   obj.toggle(500,"swing");
   }
-  $(".dropzoned").change(function () {
-    var reader = new FileReader();
-    var f = document.getElementById("file-select").files;
-    reader.onloadend = function () {
-        var data=reader.result;
-        originalimagedata =data;
-        var myImage = new Image();
-        myImage.src = data;
-        myImage.id="img";
-        setTimeout(() => {  
-        var width=myImage.width;
-        var height=myImage.height;
-        var pomer=width/height;
-        if(height>size[1]){
-            height=size[1];
-            width=pomer*size[1];
-        }
-        else if(width>size[0]){
-            width=size[0];
-            height=pomer*size[0];
-        }
-        
-        console.log(typeof(myImage));
-        canvas.createLayer("Layer "+canvas.layers.length,[width, height]);
-        canvas.layers[canvas.layers.length-1].importImage(myImage);
-        canvas.render();
-    }, 500);
-       
-    }
-    reader.readAsDataURL(f[0]);
-    
-});
-    
+  

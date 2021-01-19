@@ -238,8 +238,6 @@ let size=[1920,1080];
 let canvas = new Canvas(size,"foto","width:1000; height:500;");
 let DFBGColor=[];
 canvas.createLayer("Background");
-var layer=canvas.createLayer("BG",[50,50]);
-layer.createRect(20,0,20,50,50,0,0);
 canvas.showHistogram("histograms","none");
 canvas.layershow("layers");
 </script>
@@ -408,20 +406,25 @@ canvas.layershow("layers");
         posun=false};
         $(document).mousedown(function(event) {
             down = true;
-            $(".dropzoned").css({"width":0,"height":0});
             if($(".btn-tools-active").hasClass("crop")){
                 cropstart=[event.clientX,event.clientY];
+            $(".dropzoned").css({"width":0,"height":0});
             }
             else if($(".btn-tools-active").hasClass("brush")){
                 var id = $(".activeLayer").attr("layer-id");
+                $(".dropzoned").css({"width":0,"height":0});
                 canvas.layers[id].brush([event.clientX,event.clientY],10);
             }
             else if($(".btn-tools-active").hasClass("pointer")){
                 var id = $(".activeLayer").attr("layer-id");
+                
+                $(".dropzoned").css({"width":0,"height":0});
                 canvas.layers[id].setPosition(10,10);
             }
             else if($(".btn-tools-active").hasClass("rotation")){
                 var id = $(".activeLayer").attr("layer-id");
+                
+            $(".dropzoned").css({"width":0,"height":0});
                 canvas.layers[id].rotate(10);
             }
         }).mouseup(function(event) {
@@ -431,31 +434,14 @@ canvas.layershow("layers");
             mouse=[];
             if($(".btn-tools-active").hasClass("crop")){
                 var cropend=[event.clientX,event.clientY];
-                let myCanvas = document.createElement('canvas');
-                var id = $(".activeLayer").attr("layer-id");
-                var imgData=canvas.layers[id].layerImage;
-                var scaleRatiosirka=canvas.viewport.width/$("#canvas-layers").css("width").replace("px","");
-                var scaleRatiovyska=canvas.viewport.height/$("#canvas-layers").css("height").replace("px","");
-                var sirka=(cropend[0]-cropstart[0])*scaleRatiosirka;
-                var vyska=(cropend[1]-cropstart[1])*scaleRatiovyska;
-                var levo=cropstart[0]-$("#canvas-layers").css("width").replace("px","");
-                var top=cropstart[1]-$("#canvas-layers").css("height").replace("px","");
-                myCanvas.width = imgData.width;
-                myCanvas.height = imgData.height;
-                let myContext = myCanvas.getContext("2d");
-                myContext.putImageData(imgData,0,0)
-                myCanvas = cropCanvas(myCanvas,0,0,sirka,vyska);
-                var Imgdata = myCanvas.toDataURL("image/png");
-                canvas.createLayer("layer "+id+" croped",[sirka,vyska]); 
-                canvas.layers[canvas.layers.length-1].alphaProcesingData=canvas.layers[id].alphaProcesingData;
-                var img =new Image();
-                img.id="img";
-                img.src=Imgdata;
-                setTimeout(() => {  
-                    canvas.layers[id].delete();
-                    canvas.layers[canvas.layers.length-1].importImage(img);
-                    canvas.render();
-                        }, 200);
+                var pomerCR=canvas.size[0]/$("#canvas-layers").css("width").replace("px","");
+                var vyska=(Math.max(cropend[1],cropstart[1])-Math.min(cropend[1],cropstart[1]))*pomerCR;
+                var sirka=(Math.max(cropend[0],cropstart[0])-Math.min(cropend[0],cropstart[0]))*pomerCR;
+                var pomer= vyska/sirka;
+                canvas.canvas.height=vyska;
+                canvas.canvas.width=sirka;
+                $("#canvas-layers").css("width",$("#canvas-layers").css("height").replace("px","")/pomer)
+                canvas.render();
                 cropstart=[];
                 cropend=[];
             }
@@ -532,7 +518,39 @@ canvas.layershow("layers");
             curveschart.draw(data,options);
             canvas.render();
         });
+        $(".dropzoned").change(function () {
+    var reader = new FileReader();
+    var f = document.getElementById("file-select").files;
+    reader.onloadend = function () {
+        var data=reader.result;
+        originalimagedata =data;
+        var myImage = new Image();
+        myImage.src = data;
+        myImage.id="img";
+        setTimeout(() => {  
+        var width=myImage.width;
+        var height=myImage.height;
+        var pomer=width/height;
+        if(height>size[1]){
+            height=size[1];
+            width=pomer*size[1];
+        }
+        else if(width>size[0]){
+            width=size[0];
+            height=pomer*size[0];
+        }
         
+        canvas.createLayer("Layer "+canvas.layers.length,[width, height]);
+        canvas.layers[canvas.layers.length-1].importImage(myImage);
+        canvas.render();
+        canvas.layers[canvas.layers.length-1].brightness(1);
+    }, 500);
+       
+    }
+    reader.readAsDataURL(f[0]);
+    
+});
+    
         </script>
     <script src="{% static 'assets/FileSaver.js'%}"> </script>
     <script src="{% static 'assets/main.js'%}"> </script>
