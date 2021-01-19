@@ -241,8 +241,7 @@ class Canvas{
         this.options="";
         this.chrka=[];
         for(var i=0;i<256;i++){
-            var x=Math.min(i,10);
-            this.chrka.push(x);
+            this.chrka.push(i);
         }
         document.getElementById(workspace).appendChild(this.canvas);
     }
@@ -277,47 +276,38 @@ class Canvas{
     clearScene(){
         this.context.clearRect(0,0,this.size[0],this.size[1]);
     }
+    async characteristic(){
+        var image=this.context.getImageData(0,0,this.size[0],this.size[1]);
+        var rgba =image.data;
+        var r,g,b,y,cb,cr;
+        for(var i=0;i<rgba.length;i=i+4){
+            r = rgba[i];
+            g= rgba[i+1];
+            b= rgba[i+2];
+            y = Math.round(r*0.299+g*0.587+b*0.114);
+            cb= r *(-0.16874)+g*(-0.33126)+ b*0.50000 + 128;
+            cr=r*0.50000+g*(-0.41869)+ b*(-0.08131) + 128;
+            y=this.chrka[y];
+            r=y+(cr-128)*1.402;
+            g=y+(cb-128)*-0.34414+(cr-128)*-0.71414;
+            b=y+(cb-128)*1.772;
+            rgba[i]=r;
+            rgba[i+1]=g;
+            rgba[i+2]=b;
+        }
+        this.context.putImageData(image,0,0);
+        return true;
+    }
     //render every layer - into one whole canvas that is displayed
     render(){
         this.clearScene();
         var that= this;
-        var ycbcr=[];
-        var rgb=[];
-        var alpha=[];
         this.layers.forEach(function(layer){
             if(layer.visible){
                 that.context.drawImage(layer.canvas,layer.position[0],layer.position[1],layer.size[0],layer.size[1]);
             }
         });
-        var image=this.context.getImageData(0,0,this.size[0],this.size[1]);
-        var rgba =image.data;
-        for(var i=0;i<rgba.length;i=i+4){
-            var r = rgba[i];
-            var g= rgba[i+1];
-            var b= rgba[i+2];
-            alpha.push(rgba[i+3]);
-            rgb.push(r);
-            rgb.push(g);
-            rgb.push(b);
-            var y = Math.floor(r*0.299+g*0.587+b*0.114);
-            var cb= Math.floor(r *(-0.16874)+g*(-0.33126)+ b*0.50000 + 128);
-            var cr=Math.floor(r*0.50000+g*(-0.41869)+ b*(-0.08131) + 128);
-            ycbcr.push(y,cb,cr);
-        }
-        for(var i=0;i<ycbcr.length;i=i+3){
-            ycbcr[i]=this.chrka[ycbcr[i]];
-        }
-        var data=[];
-        for(var i=0;i<ycbcr.length;i=i+3){
-            var r=Math.floor(ycbcr[i]+(ycbcr[i+2]-128)*1.402);
-            var g=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*-0.34414+(ycbcr[i+2]-128)*-0.71414);
-            var b=Math.floor(ycbcr[i]+(ycbcr[i+1]-128)*1.772);
-            data.push(r,g,b,alpha[i/3]);
-        }
-        for(var i=0;i<data.length;i++){
-            rgba[i]=data[i];
-        }
-        this.context.putImageData(image,0,0);
+        this.characteristic();
         if(this.histView){
             this.histogram();
         }
