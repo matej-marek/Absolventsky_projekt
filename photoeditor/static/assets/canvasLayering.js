@@ -20,6 +20,7 @@ class Layer{
         this.alphaProcesingData=100; // alpha procentage
         this.layerImage=this.context.getImageData(0,0,this.size[0],this.size[1]);
         this.layerData=this.layerImage;
+        this.rotation;
     }
     //clear whole layer to basic
     clear(){
@@ -79,13 +80,6 @@ class Layer{
         this.whole.layers.splice(this.position,1);
         console.log(this.whole);
     }
-    //rotate layer
-    rotate(angle){
-        this.context.rotate(angle * Math.PI / 180);
-        this.clear();
-        this.context.drawImage(this.layerImage,this.position[0],this.position[1]);
-        this.whole.render();
-    }
     //create rectangle in the layer
     createRect(r,g,b,width,height,left,top){
         r=r||255;
@@ -142,15 +136,12 @@ class Layer{
     // add or substract brightness of image in EV
     brightness(value){
         var EV = value-this.jas;
-        console.log(EV);
         this.jas=value;
         var sirka=this.size[0];
         var vyska=this.size[1];
         var data=this.ycbcr;
-        console.log(data);
         var pocetdata=sirka*vyska*3;
         var coef=Math.pow(2,EV);
-        console.log(coef)
         for(var x=0;x<=pocetdata;x+=3){
             var jas = Math.floor(data[x]*coef);
             if(jas<255){
@@ -351,7 +342,9 @@ class Canvas{
         var that= this;
         this.layers.forEach(function(layer){
             if(layer.visible){
+                that.context.rotate(layer.rotation);
                 that.context.drawImage(layer.canvas,layer.position[0],layer.position[1],layer.size[0],layer.size[1]);
+                that.context.rotate(-1*layer.rotation);
             }
         });
         this.characteristic();

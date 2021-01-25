@@ -425,7 +425,8 @@ canvas.layershow("layers");
                 var id = $(".activeLayer").attr("layer-id");
                 
             $(".dropzoned").css({"width":0,"height":0});
-                canvas.layers[id].rotate(10);
+                canvas.layers[id].rotation=10;
+                canvas.render();
             }
         }).mouseup(function(event) {
             down = false;  
@@ -437,9 +438,17 @@ canvas.layershow("layers");
                 var pomerCR=canvas.size[0]/$("#canvas-layers").css("width").replace("px","");
                 var vyska=(Math.max(cropend[1],cropstart[1])-Math.min(cropend[1],cropstart[1]))*pomerCR;
                 var sirka=(Math.max(cropend[0],cropstart[0])-Math.min(cropend[0],cropstart[0]))*pomerCR;
+                var levo=(Math.min(cropend[0],cropstart[0])-$("#canvas-layers").css("left").replace("px",""))*pomerCR;
+                var top=(Math.min(cropend[1],cropstart[1])-$("#canvas-layers").css("top").replace("px",""))*pomerCR;
+                console.log(levo);
+                canvas.layers.forEach(function(layer){
+                    layer.position[0]-=levo;
+                    layer.position[1]-=top;
+                });
                 var pomer= vyska/sirka;
                 canvas.canvas.height=vyska;
                 canvas.canvas.width=sirka;
+                $("#canvas-layers").css("height",vyska/pomerCR)
                 $("#canvas-layers").css("width",$("#canvas-layers").css("height").replace("px","")/pomer)
                 canvas.render();
                 cropstart=[];
