@@ -555,18 +555,10 @@ color: #d0d0d0;
     left:auto;
     transform:skew(8deg) rotate(3deg);
 }
-.curves-slider{
-   width: 100%;
-}
 .curves{
     width: 100%;
-    height: 250px;
-}
-#curvesChart{
-    float:left;
-}
-.verical{writing-mode: bt-lr; /* IE */
-    -webkit-appearance: slider-vertical; /* WebKit */
-    float:left;
-    width: 20px;
+    height: 220px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }

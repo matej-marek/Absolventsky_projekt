@@ -10,6 +10,12 @@
         <script src="{% static 'assets/dropzone.js' %}"></script>
         <link rel="stylesheet" href="{% static 'assets/style/dropzone.css'%}">
         <link rel="stylesheet" href="{% static 'assets/style/main.min.css'%}">
+        <script src="{% static 'assets/Rgraph/RGraph.common.core.js' %}"></script> 
+        <script src="{% static 'assets/Rgraph/Rgraph.Line.js' %}"></script>
+        <script src="{% static 'assets/Rgraph/RGraph.svg.common.core.js' %}"></script>
+        <script src="{% static 'assets/Rgraph/RGraph.svg.line.js' %}"></script>   
+        <script src="{% static 'assets/Rgraph/RGraph.common.dynamic.js' %}"></script>  
+        <script src="{% static 'assets/Rgraph/RGraph.drawing.xaxis.js ' %}"></script>  
         <script>
             
         let curveschart,options;
@@ -25,13 +31,19 @@
   
           options = {
             curveType: 'function',
-            legend: { position: 'bottom' },
+            legend: 'none',
+            backgroundColor: { fill:'transparent' },
+            chartArea: {width: '100%', height: '100%'},
             vAxis: {
     viewWindowMode:'explicit',
         viewWindow: {
             max:255,
             min:0
-        }
+        },
+        format:null,
+        gridlines: { count: 0 }
+    },hAxis:{
+        gridlines: { count: 0 }
     }
           };
   
@@ -202,14 +214,11 @@
                 <div class="histograms" id="histograms">
                 </div>
                 <div class="curves" id="curves">
-                    <input type="range" min="0" max="255" value="255" class="curves-slider" point="white" position="top">
-                    <input type="range" min="0" max="255" value="0" class="curves-slider verical" point="black" position="side">
-                    <div style="height: 200px;width:200px;" id="curvesChart"></div>
-                    <input type="range" min="0" max="255" value="255" class="curves-slider verical" point="white" position="side">
-                    <input type="range" min="0" max="255" value="0" class="curves-slider" point="black" position="bottom">
+                    <canvas id="PrevodniChrka" width="200" height="200" style="background-image: linear-gradient(white,black)">[No canvas support]</canvas>
                 </div>
-                <h1>{{preklad.upravy.nadpis}}</h1>
-                    Aplha <input type="number" min="0" max="100" value="100" id="alpha">
+                    Aplha: <input type="number" min="0" max="100" value="100" id="alpha">
+                    Doostření: <input type="number" min="0" max="1" value="0" step="0.01"id="sharpen">
+                    Jas: <input type="number" min="-10" max="10" value="0" step="0.01" id="brightness">
                 <h2>Vrstvy</h2>
                 <button onclick="makeColorLayer()">Add layer</button>
                 <div class="layers" id="layers" style="overflow-y: scroll; height:200px;">
@@ -261,6 +270,14 @@ canvas.layershow("layers");
             $("#alpha").on("change",function(){
                 var id= $(".activeLayer").attr("layer-id");
                 canvas.layers[id].alphaProcesing($(this).val());
+            });
+            $("#brightness").on("change",function(){
+                var id= $(".activeLayer").attr("layer-id");
+                canvas.layers[id].brightness($(this).val());
+            });
+            $("#sharpen").on("change",function(){
+                var id= $(".activeLayer").attr("layer-id");
+                canvas.layers[id].sharpen($(this).val());
             });
             $(".downloads").click(function(){
                 console.log($(".nameProject").val());
@@ -377,6 +394,24 @@ canvas.layershow("layers");
             document.onwheel = zoom;
         </script>
         <script>
+var dragTimer;
+$(document).on('dragover', function(e) {
+  var dt = e.originalEvent.dataTransfer;
+  if (dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('Files'))) {
+    $("#file-select").show();
+    window.clearTimeout(dragTimer);
+  }
+});
+$(document).on('dragleave', function(e) {
+  dragTimer = window.setTimeout(function() {
+    $("#file-select").hide();
+  }, 25);
+});
+
+$("#file-select").hide();
+
+
+
         var mouse=[];
         var mousebefore=[]
         let posun=false;
@@ -384,7 +419,7 @@ canvas.layershow("layers");
         var cropstart=[];
         var cropend=[];
         /* je zmačkutá myš? */
-        document.ondblclick = function(event){
+        document.getElementById("workspace").ondblclick = function(event){
             let clientwindow=[$(".workspace").css("width").replace("px",""),$(".workspace").css("height").replace("px","")];
             var basicsizes=[1000,500];
             $("#canvas-layers").css("width",basicsizes[0]);
@@ -404,33 +439,28 @@ canvas.layershow("layers");
                 var left=((clientwindow[0]-pravybar-levybar-basicsizes[0])/2)+levybar;
             $("#canvas-layers").css({"position":"relative","top":(clientwindow[1]-basicsizes[1])/2,"left":left});
         posun=false};
-        $(document).mousedown(function(event) {
+        $("#workspace").mousedown(function(event) {
             down = true;
             if($(".btn-tools-active").hasClass("crop")){
                 cropstart=[event.clientX,event.clientY];
-            $(".dropzoned").css({"width":0,"height":0});
             }
             else if($(".btn-tools-active").hasClass("brush")){
                 var id = $(".activeLayer").attr("layer-id");
-                $(".dropzoned").css({"width":0,"height":0});
                 canvas.layers[id].brush([event.clientX,event.clientY],10);
             }
             else if($(".btn-tools-active").hasClass("pointer")){
                 var id = $(".activeLayer").attr("layer-id");
                 
-                $(".dropzoned").css({"width":0,"height":0});
                 canvas.layers[id].setPosition(10,10);
             }
             else if($(".btn-tools-active").hasClass("rotation")){
                 var id = $(".activeLayer").attr("layer-id");
                 
-            $(".dropzoned").css({"width":0,"height":0});
                 canvas.layers[id].rotation=10;
                 canvas.render();
             }
         }).mouseup(function(event) {
             down = false;  
-            $(".dropzoned").css({"width":100+"vw","height":100+"vh"});
             mousebefore=[];
             mouse=[];
             if($(".btn-tools-active").hasClass("crop")){
@@ -456,7 +486,7 @@ canvas.layershow("layers");
             }
         });
         /* pohyb s canvasem pokud je zapnuta ruka */
-        document.onmousemove = function(e){
+        document.getElementById("workspace").onmousemove = function(e){
             if($(".btn-tools-active").hasClass("hand")){
                 if(down){
                     if(mousebefore!=[]){
@@ -479,54 +509,6 @@ canvas.layershow("layers");
             destCanvas.getContext("2d").drawImage(sourceCanvas,left,top,width,height,0,0,width,height);      // newCanvas, same size as source rect
             return destCanvas;
         }
-        /* curves */
-        $(".curves-slider").change(function(){
-            let black=[0,0];
-            let white=[255,255];
-            $(".curves-slider").each(function(el){
-                el=$($(".curves-slider")[el]);
-                if(el.attr("point")=="black"){
-                    if(el.attr("position")=="bottom"){
-                        black[0]=$(el).val();
-                    }
-                    else{
-                        black[1]=$(el).val();
-                    }
-                }
-                else{
-                    if(el.attr("position")=="top"){
-                        white[0]=$(el).val();
-                    }
-                    else{
-                        white[1]=$(el).val();
-                    }
-                }
-            });
-            var x=white[0]-black[0];
-            var y=white[1]-black[1];
-            var pomer=y/x;
-            var add=0;
-            var datas=new Array(['X','Y']);
-            var predchozi=0;
-            for(var i=0;i<256;i++){
-                if(i<=black[0]){
-                    canvas.chrka[i]=parseInt(black[1]);
-                    predchozi=parseInt(black[1]);
-                }
-                else if(i>=white[0]){
-                    canvas.chrka[i]=parseInt(white[1]);
-                }
-                else{
-                    add+=pomer;
-                    canvas.chrka[i]=predchozi+add;
-                }
-                datas.push([i,canvas.chrka[i]]); 
-
-            } 
-            var data = google.visualization.arrayToDataTable(datas);
-            curveschart.draw(data,options);
-            canvas.render();
-        });
         $(".dropzoned").change(function () {
     var reader = new FileReader();
     var f = document.getElementById("file-select").files;
@@ -552,13 +534,94 @@ canvas.layershow("layers");
         canvas.createLayer("Layer "+canvas.layers.length,[width, height]);
         canvas.layers[canvas.layers.length-1].importImage(myImage);
         canvas.render();
-        canvas.layers[canvas.layers.length-1].brightness(1);
     }, 500);
        
     }
     reader.readAsDataURL(f[0]);
+    $("#file-select").hide();
     
 });
+  
+            let line;
+                line = new RGraph.Line({
+        id: 'PrevodniChrka',
+        data: [
+            [0,50,100,150,200,255]
+        ],
+        options: {
+            linewidth: 0,
+            marginInner: 0,
+            shadow: false,
+            adjustable: true,
+            outofbounds: true,
+            yaxisScaleMax: 255,
+            yaxisScaleMin: 0,
+            tickmarksStyle: 'circle',
+            tickmarksSize: 5,
+            xaxisTickmarks: false,
+            yaxisTickmarks: false,
+            yaxis:false,
+            xaxis:false,
+            yaxisLabels: false,
+            xaxisLabels: false,
+            yaxisTickmarks:false,
+            yaxisTickmarksCount:0,
+            yaxisLabelsCount:0,
+            yaxisLabels:[],
+            textSize:1,
+            textColor: 'transparent',
+            marginBottom:0,
+            marginTop:0,
+            marginLeft:0,
+            marginRight:0
+        }
+    });
+    line.trace();
+    line.canvas.addEventListener('mouseup', function(e){
+        if(e.detail==1){
+        var arr=[],last_x=0;
+        for(var i=0; i<line.data[0].length;i++){
+            var delka=Math.floor(255/(line.data[0].length)-1);
+            var pro_prevyseni=0;
+            if (line.data_arr[i]){
+                pro_prevyseni=line.data[0][i];
+            }
+            else{
+                pro_prevyseni=0.00001;
+            }
+            var prevyseni=pro_prevyseni*(((line.data_arr[i+1]/pro_prevyseni)-1)/delka);
+            last_y=line.data[0][i];
+            for(var x=0;x<delka;x++){
+                if(last_y>255 || isNaN(last_y)){
+                    last_y=pro_prevyseni;
+                }
+                else if(last_y<0){
+                    last_y=0;
+                }
+                arr.push(last_y);
+                last_y=last_y+prevyseni;
+                last_x++
+            }
+        }
+        var delka_arr=arr.length;
+        for(var i=0;i<256-delka_arr;i++){
+            arr.push(arr[delka_arr-1])
+        }
+        canvas.chrka=arr;
+        canvas.render();}
+        else{
+            var arr=[];
+    for(var i=0;i<256;i++){
+        arr.push(i);
+    }
+    arr_to_update=[0,50,100,150,200,255];
+    RGraph.clear(document.getElementById("PrevodniChrka")); 
+    line.original_data[0]=arr_to_update;   
+    line.trace();
+    canvas.chrka=arr;
+    canvas.render();
+        }
+    });
     
         </script>
     <script src="{% static 'assets/FileSaver.js'%}"> </script>

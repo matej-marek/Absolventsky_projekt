@@ -296,7 +296,6 @@ class Canvas{
     findLayer(name){
         var layerFind=null;
         this.layers.forEach(function(layer){
-            console.log(layer.name,name);
             if(layer.name==name){
                 layerFind=layer;
             }
@@ -409,6 +408,10 @@ class Canvas{
                 scaleType: 'lin',
                 gridlines: { count: 0 }
             },
+            hAxis:{
+                gridlines: { count: 0 }
+            },
+            chartArea: {width: '100%', height: '100%'},
             colors: ['#dddddd']
         };
         function drawChart() {
