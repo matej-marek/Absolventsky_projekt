@@ -101,6 +101,9 @@ $("#histogramShow").on("change",function(){
 $("#layersShow").on("change",function(){
     $(".layers").toggle();
 });
+$("#curvesShow").on("change",function(){
+  $(".curves").toggle();
+});
 
 if(getCookie("sides")=='true'){
   console.log("true");

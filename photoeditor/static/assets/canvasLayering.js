@@ -581,11 +581,9 @@ function imagedata_to_image(imagedata,i) {
     image.className="layerImage";
     return image;
 }
-function makeColorLayer(hex){
-    hex=hex||"#ffffff";
-    var values=hexToRgb(hex);
+function makeColorLayer(){
     canvas.createLayer("Layer "+canvas.layers.length);
-    canvas.layers[canvas.layers.length-1].BGcolor();
+    canvas.layers[canvas.layers.length-1].alphaProcesingData=0;
     canvas.render();
 }
 function hexToRgb(hex) {
