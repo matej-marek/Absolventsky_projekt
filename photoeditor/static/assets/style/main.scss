@@ -489,6 +489,25 @@ background-color: #05df05;
 .disline{
 background-color: #df0505;
 }
+
+
+.LayerControls{
+    position:absolute;
+    background-color: #505050;
+    width:100px;
+    height:200px;
+    z-index: 20;
+    border: 1px solid white;
+    label{
+        color:white;
+        width:calc(100% - 20px);
+        margin: 10px 10px;
+    }
+    input{
+        width:calc(100% - 20px);
+        margin: 10px 10px;
+    }
+}
 @media only screen and (max-width: 800px) {
 .agreeTable{
 width:400px;

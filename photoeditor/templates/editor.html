@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="{% static 'assets/style/dropzone.css'%}">
         <link rel="stylesheet" href="{% static 'assets/style/main.min.css'%}">
         <script src="{% static 'assets/Rgraph/RGraph.common.core.js' %}"></script> 
-        <script src="{% static 'assets/Rgraph/Rgraph.Line.js' %}"></script>
+        <script src="{% static 'assets/Rgraph/RGraph.line.js' %}"></script>
         <script src="{% static 'assets/Rgraph/RGraph.svg.common.core.js' %}"></script>
         <script src="{% static 'assets/Rgraph/RGraph.svg.line.js' %}"></script>   
         <script src="{% static 'assets/Rgraph/RGraph.common.dynamic.js' %}"></script>  
@@ -212,9 +212,6 @@
                 <div class="curves" id="curves">
                     <canvas id="PrevodniChrka" width="200" height="200" style="background-image: linear-gradient(white,black)">[No canvas support]</canvas>
                 </div>
-                    Aplha: <input type="number" min="0" max="100" value="100" id="alpha">
-                    Doostření: <input type="number" min="0" max="1" value="0" step="0.01"id="sharpen">
-                    Jas: <input type="number" min="-10" max="10" value="0" step="0.01" id="brightness">
                 <h2>Vrstvy</h2>
                 <button onclick="makeColorLayer()">Add layer</button>
                 <div class="layers" id="layers" style="overflow-y: scroll; height:200px;">
@@ -230,6 +227,11 @@
                 </div> 
         </div>
             
+        <div class="LayerControls" id="LayerControls">
+            <label for="alpha">Aplha:</label><input type="number" min="0" max="100" value="100" name="alpha" id="alpha">
+            <label for="sharpen">Doostření:</label> <input type="number" min="0" max="1" value="0" step="0.01"id="sharpen" name="sharpen">
+            <label for="brightness">Jas:</label><input type="number" min="-10" max="10" value="0" step="0.01" id="brightness" name="sharpen">
+        </div>
 
         {% csrf_token %}        
     </body>
@@ -619,6 +621,34 @@ $("#file-select").hide();
         }
     });
     
+        </script>
+
+        <script type="text/javascript">
+        $.event.special.rightclick = {
+    bindType: "contextmenu",
+    delegateType: "contextmenu"
+
+
+};
+$(document).on("rightclick", ".layerShowing", function(e) {
+    $("#LayerControls").show()
+    $("#LayerControls").css("top",e.pageY - $("#LayerControls").css("height").replace("px",""));
+    $("#LayerControls").css("left",e.pageX - $("#LayerControls").css("width").replace("px",""));
+    return false;
+});
+$("#LayerControls").hide();
+
+$(document).on("click",function(e){
+    if($("#LayerControls").css("display")!="none"){
+        var width=document.getElementById("LayerControls").clientWidth;
+        var height=document.getElementById("LayerControls").clientHeight;
+        var top=parseInt(document.getElementById("LayerControls").style.top.replace("px",""));
+        var left=parseInt(document.getElementById("LayerControls").style.left.replace("px",""));
+        if(e.pageX < left|| e.pageX> left+width || e.pageY < top || e.pageY > top + height){
+            $("#LayerControls").hide();
+        }
+    }
+});
         </script>
     <script src="{% static 'assets/FileSaver.js'%}"> </script>
     <script src="{% static 'assets/main.js'%}"> </script>
