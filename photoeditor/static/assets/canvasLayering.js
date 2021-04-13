@@ -495,25 +495,28 @@ class Canvas{
         layers.innerHTML="";
         var x=0;
         for(var i=this.layers.length-1;i>=0;i--){
-            if(i==this.layers.length-1){
-                var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'><button class='layerDown'  onclick='layerDown("+i+")' layer-id='"+i+"'>↓</button>";
+            if(i==this.layers.length-1 && i!=0){
+                var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'><button class='layerDown button-layer'  onclick='layerDown("+i+")' layer-id='"+i+"'>↓</button>";
+            }
+            else if(i==this.layers.length-1 && i==0){
+                var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'>";
             }
             else if(i==0){
-                var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'><button class='layerUp' onclick='layerUp("+i+")' layer-id='"+i+"'>↑</button>";
+                var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'><button class='layerUp button-layer' onclick='layerUp("+i+")' layer-id='"+i+"'>↑</button>";
             }
             else{ 
-                var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'><button class='layerUp' onclick='layerUp("+i+")' layer-id='"+i+"'>↑</button><button class='layerDown' onclick='layerDown("+i+")' layer-id='"+i+"'>↓</button>";
+                var data="<input type='text' class='layerName' layer-id='"+i+"' value='"+this.layers[i].name+"'><button class='layerUp button-layer' onclick='layerUp("+i+")' layer-id='"+i+"'>↑</button><button class='layerDown button-layer' onclick='layerDown("+i+")' layer-id='"+i+"'>↓</button>";
             }
             var img=imagedata_to_image(this.layers[i].layerImage,i); 
             if(i==this.layers.length-1){
-                layers.innerHTML+="<div id='layerShowing"+i+"' class='layerShowing activeLayer' layer-id='"+i+"'>"+data+"<button onclick='deleteLayer("+i+")'>X</button></div>";    
+                layers.innerHTML+="<div id='layerShowing"+i+"' class='layerShowing activeLayer' layer-id='"+i+"'>"+data+"<button class='button-layer' onclick='deleteLayer("+i+")'>X</button></div>";    
             }
             else{
                 if(activeLayer>0&&hodnotaActiveLayer==i){
-                    layers.innerHTML+="<div id='layerShowing"+i+"' class='layerShowing activeLayer' layer-id='"+i+"'>"+data+"<button onclick='deleteLayer("+i+")'>X</button></div>";    
+                    layers.innerHTML+="<div id='layerShowing"+i+"' class='layerShowing activeLayer' layer-id='"+i+"'>"+data+"<button class='button-layer' onclick='deleteLayer("+i+")'>X</button></div>";    
                 }
                 else{
-                    layers.innerHTML+="<div id='layerShowing"+i+"' class='layerShowing' layer-id='"+i+"'>"+data+"<button onclick='deleteLayer("+i+")'>X</button></div>";    
+                    layers.innerHTML+="<div id='layerShowing"+i+"' class='layerShowing' layer-id='"+i+"'>"+data+"<button class='button-layer' onclick='deleteLayer("+i+")'>X</button></div>";    
                 }
             }  
             var div = document.getElementById("layerShowing"+i);
