@@ -454,9 +454,7 @@ $("#file-select").hide();
                 canvas.layers[id].brush([event.clientX,event.clientY],10);
             }
             else if($(".btn-tools-active").hasClass("pointer")){
-                var id = $(".activeLayer").attr("layer-id");
-                
-                canvas.layers[id].setPosition(10,10);
+                mousebefore=[event.clientX,event.clientY];
             }
             else if($(".btn-tools-active").hasClass("rotation")){
                 var id = $(".activeLayer").attr("layer-id");
@@ -465,9 +463,7 @@ $("#file-select").hide();
                 canvas.render();
             }
         }).mouseup(function(event) {
-            down = false;  
-            mousebefore=[];
-            mouse=[];
+            down = false; 
             if($(".btn-tools-active").hasClass("crop")){
                 var cropend=[event.clientX,event.clientY];
                 var pomerCR=canvas.size[0]/$("#canvas-layers").css("width").replace("px","");
@@ -492,8 +488,7 @@ $("#file-select").hide();
         });
         /* pohyb s canvasem pokud je zapnuta ruka */
         document.getElementById("workspace").onmousemove = function(e){
-            if($(".btn-tools-active").hasClass("hand")){
-                if(down){
+            if($(".btn-tools-active").hasClass("hand")&&down){
                     if(mousebefore!=[]){
                         mousebefore=mouse, mouse=[e.clientX,e.clientY];
                     }
@@ -502,7 +497,12 @@ $("#file-select").hide();
                     }
                     posun=true, rozdily=mousebefore[1]-mouse[1], rozdilx=mousebefore[0]-mouse[0];
                     $("#canvas-layers").css({"top":( $("#canvas-layers").css("top").replace("px","")-rozdily),"left":( $("#canvas-layers").css("left").replace("px","")-rozdilx)});
-                }
+         }
+            else if($(".btn-tools-active").hasClass("pointer") && down){
+                var id = $(".activeLayer").attr("layer-id");
+                mouse=[event.clientX,event.clientY];
+                canvas.layers[id].setPosition(mouse[0]-mousebefore[0],mouse[1]-mousebefore[1]);
+                mousebefore=mouse;
             }
         }
 
